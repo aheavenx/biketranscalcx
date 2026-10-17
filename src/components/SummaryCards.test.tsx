@@ -24,7 +24,12 @@ describe('SummaryCards', () => {
     expect(screen.getByText('243 vs 268')).toBeInTheDocument();
     expect(screen.getByText(/A monthly pass is the cheaper way to pay for 460 trips a year/)).toBeInTheDocument();
     expect(screen.getByText(/Cycling is cheaper on true cost from year 1/)).toBeInTheDocument();
-    expect(screen.getByText(/1 bike bought; the one you finish with is worth about €578/)).toBeInTheDocument();
+    expect(screen.getByText('1 bike bought at €800.')).toBeInTheDocument();
+  });
+
+  it('counts replacement bikes', () => {
+    render(<SummaryCards costs={{ ...costs, bike: { upfront: 800, bikesBought: 3 } }} horizonYears={5} />);
+    expect(screen.getByText('3 bikes bought at €800 each.')).toBeInTheDocument();
   });
 
   it('explains when cycling never breaks even', () => {

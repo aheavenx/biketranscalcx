@@ -1,6 +1,6 @@
-import type { Inputs, NumericInputKey, SelectInputKey } from './types';
+import type { Inputs, NumericInputKey, OptionalNumericInputKey, SelectInputKey } from './types';
 
-export type FieldGroup = 'projection' | 'commute' | 'transit' | 'bike' | 'you' | 'advanced';
+export type FieldGroup = 'projection' | 'commute' | 'transit' | 'bike' | 'you' | 'advanced' | 'geeky';
 
 export interface NumberFieldSpec {
   kind: 'number';
@@ -16,16 +16,24 @@ export interface NumberFieldSpec {
   hint?: string;
 }
 
+/** A number that may be left blank, in which case the model computes the value itself. */
+export interface OptionalNumberFieldSpec extends Omit<NumberFieldSpec, 'kind' | 'key'> {
+  kind: 'optionalNumber';
+  key: OptionalNumericInputKey;
+}
+
+export type NumericFieldSpec = NumberFieldSpec | OptionalNumberFieldSpec;
+
 export interface SelectFieldSpec {
   kind: 'select';
   key: SelectInputKey;
   urlKey: string;
   group: FieldGroup;
   label: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; hint?: string }[];
 }
 
-export type FieldSpec = NumberFieldSpec | SelectFieldSpec;
+export type FieldSpec = NumberFieldSpec | OptionalNumberFieldSpec | SelectFieldSpec;
 
 export const DEFAULT_INPUTS: Inputs = {
   horizonYears: 5,
@@ -36,7 +44,6 @@ export const DEFAULT_INPUTS: Inputs = {
   singleTicket: 3,
   monthlyPass: 60,
   bikePrice: 800,
-  depreciationPct: 15,
   replaceEveryYears: 8,
   bikeCarePerYear: 120,
   bikeSpeedKmh: 18,
@@ -47,9 +54,10 @@ export const DEFAULT_INPUTS: Inputs = {
   weightKg: 75,
   fitness: 'moderate',
   valueOfTimePerHour: 15,
-  mealPrice: 6,
-  kcalPerMeal: 650,
+  chickenPricePerKg: 10,
+  ricePricePerKg: 2,
   cyclistFatalityPerBillionKm: 15,
+  avgPowerW: null,
 };
 
 const num = (spec: Omit<NumberFieldSpec, 'kind'>): NumberFieldSpec => ({ kind: 'number', ...spec });
@@ -64,7 +72,6 @@ export const FIELD_SPECS: FieldSpec[] = [
   num({ key: 'singleTicket', urlKey: 'st', group: 'transit', label: 'Single ticket price', unit: '€', min: 0, max: 50, step: 0.1, integer: false }),
   num({ key: 'monthlyPass', urlKey: 'mp', group: 'transit', label: 'Monthly pass price', unit: '€', min: 0, max: 1000, step: 1, integer: false }),
   num({ key: 'bikePrice', urlKey: 'bp', group: 'bike', label: 'Bike price', unit: '€', min: 0, max: 20000, step: 10, integer: false }),
-  num({ key: 'depreciationPct', urlKey: 'dp', group: 'bike', label: 'Depreciation', unit: '%/year', min: 0, max: 60, step: 1, integer: false }),
   num({ key: 'replaceEveryYears', urlKey: 'ry', group: 'bike', label: 'Replace bike every', unit: 'years', min: 1, max: 30, step: 1, integer: true }),
   num({ key: 'bikeCarePerYear', urlKey: 'bc', group: 'bike', label: 'Bike care', unit: '€/year', min: 0, max: 5000, step: 5, integer: false }),
   num({ key: 'bikeSpeedKmh', urlKey: 'bs', group: 'bike', label: 'Average riding speed', unit: 'km/h', min: 5, max: 45, step: 0.5, integer: false }),
@@ -90,18 +97,32 @@ export const FIELD_SPECS: FieldSpec[] = [
     urlKey: 'ft',
     group: 'you',
     label: 'Fitness level',
+    // Hints describe the Jackson et al. (1990) activity rating each level maps to (see fitness.ts).
     options: [
-      { value: 'sedentary', label: 'Sedentary' },
-      { value: 'light', label: 'Lightly active' },
-      { value: 'moderate', label: 'Moderately active' },
-      { value: 'active', label: 'Very active' },
-      { value: 'athlete', label: 'Athlete' },
+      { value: 'sedentary', label: 'Sedentary', hint: 'Little exercise beyond occasional walks.' },
+      { value: 'light', label: 'Lightly active', hint: 'Up to 1 hour a week of moderate exercise.' },
+      { value: 'moderate', label: 'Moderately active', hint: 'More than 1 hour a week of moderate exercise.' },
+      { value: 'active', label: 'Very active', hint: '30–60 minutes a week of hard exercise like running.' },
+      { value: 'athlete', label: 'Athlete', hint: 'More than 3 hours a week of hard training.' },
     ],
   },
   num({ key: 'valueOfTimePerHour', urlKey: 'vt', group: 'you', label: 'Value of your time', unit: '€/h', min: 0, max: 500, step: 1, integer: false, hint: 'Set to 0 to compare money only.' }),
-  num({ key: 'mealPrice', urlKey: 'ml', group: 'you', label: 'Price per balanced meal', unit: '€', min: 0, max: 100, step: 0.5, integer: false }),
-  num({ key: 'kcalPerMeal', urlKey: 'kc', group: 'you', label: 'Calories per balanced meal', unit: 'kcal', min: 200, max: 2000, step: 10, integer: false }),
+  num({ key: 'chickenPricePerKg', urlKey: 'cp', group: 'you', label: 'Chicken breast price', unit: '€/kg', min: 0, max: 100, step: 0.1, integer: false }),
+  num({ key: 'ricePricePerKg', urlKey: 'rp', group: 'you', label: 'Rice price', unit: '€/kg', min: 0, max: 50, step: 0.1, integer: false, hint: 'The extra calories you burn are eaten back half as chicken, half as rice.' }),
   num({ key: 'cyclistFatalityPerBillionKm', urlKey: 'cf', group: 'advanced', label: 'Cyclist fatality rate', unit: 'deaths per billion km', min: 0, max: 200, step: 1, integer: false, hint: 'About 8 in the Netherlands and 21 in the UK (ITF/IRTAD, 2011–2015).' }),
+  {
+    kind: 'optionalNumber',
+    key: 'avgPowerW',
+    urlKey: 'pw',
+    group: 'geeky',
+    label: 'Average power per trip',
+    unit: 'W',
+    min: 10,
+    max: 1000,
+    step: 1,
+    integer: false,
+    hint: 'Enter your own, e.g. from a power meter, or leave blank to use the computed value.',
+  },
 ];
 
 export const NUMBER_FIELDS: NumberFieldSpec[] = FIELD_SPECS.filter(
@@ -114,7 +135,7 @@ export function getNumberSpec(key: NumericInputKey): NumberFieldSpec {
   return spec;
 }
 
-export function isValidNumber(spec: NumberFieldSpec, value: number): boolean {
+export function isValidNumber(spec: NumericFieldSpec, value: number): boolean {
   return (
     Number.isFinite(value) &&
     value >= spec.min &&
@@ -127,7 +148,7 @@ export function isValidSelect(spec: SelectFieldSpec, value: string): boolean {
   return spec.options.some((option) => option.value === value);
 }
 
-export function rangeMessage(spec: NumberFieldSpec): string {
+export function rangeMessage(spec: NumericFieldSpec): string {
   const kind = spec.integer ? 'a whole number' : 'a number';
   return `Enter ${kind} from ${spec.min} to ${spec.max}`;
 }

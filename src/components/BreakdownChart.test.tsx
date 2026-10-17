@@ -22,4 +22,10 @@ describe('BreakdownChart', () => {
     expect(within(totalRow).getByText('€9,490')).toBeInTheDocument();
     expect(screen.getByRole('rowheader', { name: 'Extra food' })).toBeInTheDocument();
   });
+
+  it('labels the bike cost as a purchase, not depreciation', () => {
+    render(<BreakdownChart rows={rows} />);
+    expect(screen.getByRole('rowheader', { name: 'Bike purchase' })).toBeInTheDocument();
+    expect(screen.queryByText(/depreciation/i)).not.toBeInTheDocument();
+  });
 });

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  averagePowerW,
   bodySurfaceArea,
-  mechanicalPowerW,
+  computedPowerW,
   netKcalPerHour,
   netKcalPerTrip,
   restingKcalPerHour,
@@ -14,9 +15,19 @@ describe('bodySurfaceArea', () => {
   });
 });
 
-describe('mechanicalPowerW', () => {
-  it('includes rolling, aero and the urban factor', () => {
-    expect(mechanicalPowerW(DEFAULT_INPUTS)).toBeCloseTo(95.79, 2);
+describe('computedPowerW', () => {
+  it('includes rolling, aero and the stop-and-go factor', () => {
+    expect(computedPowerW(DEFAULT_INPUTS)).toBeCloseTo(84.3, 2);
+  });
+});
+
+describe('averagePowerW', () => {
+  it('uses the computed power when no own power is entered', () => {
+    expect(averagePowerW(DEFAULT_INPUTS)).toBeCloseTo(84.3, 2);
+  });
+
+  it('uses the entered power instead of the computed one', () => {
+    expect(averagePowerW({ ...DEFAULT_INPUTS, avgPowerW: 150 })).toBe(150);
   });
 });
 
@@ -35,9 +46,14 @@ describe('restingKcalPerHour', () => {
 describe('netKcalPerHour', () => {
   it('lands in the expected range for defaults', () => {
     const value = netKcalPerHour(DEFAULT_INPUTS);
-    expect(value).toBeCloseTo(345.83, 2);
-    expect(value).toBeGreaterThan(300);
-    expect(value).toBeLessThan(380);
+    expect(value).toBeCloseTo(296.38, 2);
+    expect(value).toBeGreaterThan(250);
+    expect(value).toBeLessThan(350);
+  });
+
+  it('follows the entered power regardless of speed', () => {
+    expect(netKcalPerHour({ ...DEFAULT_INPUTS, avgPowerW: 150 })).toBeCloseTo(579.03, 2);
+    expect(netKcalPerHour({ ...DEFAULT_INPUTS, avgPowerW: 150, bikeSpeedKmh: 30 })).toBeCloseTo(579.03, 2);
   });
 
   it('is lower for fitter riders (higher efficiency)', () => {
@@ -69,6 +85,6 @@ describe('netKcalPerHour', () => {
 
 describe('netKcalPerTrip', () => {
   it('scales hourly burn by ride time', () => {
-    expect(netKcalPerTrip(DEFAULT_INPUTS)).toBeCloseTo(153.7, 1);
+    expect(netKcalPerTrip(DEFAULT_INPUTS)).toBeCloseTo(131.72, 2);
   });
 });

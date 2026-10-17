@@ -4,7 +4,7 @@ import type { Inputs } from '../model/types';
 
 /** Parses one untrusted value (URL string or stored JSON value); undefined when invalid. */
 function parseFieldValue(spec: FieldSpec, raw: unknown): Inputs[keyof Inputs] | undefined {
-  if (spec.kind === 'number') {
+  if (spec.kind === 'number' || spec.kind === 'optionalNumber') {
     let value = Number.NaN;
     if (typeof raw === 'number') value = raw;
     else if (typeof raw === 'string' && raw.trim() !== '') value = Number(raw);

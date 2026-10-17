@@ -30,7 +30,14 @@ export default function App() {
           <SummaryCards costs={results.costs} horizonYears={inputs.horizonYears} />
         </div>
         <aside className="area-inputs">
-          <InputPanel key={resetCount} inputs={inputs} setInput={setInput} onReset={handleReset} shareUrl={shareUrl} />
+          <InputPanel
+            key={resetCount}
+            inputs={inputs}
+            setInput={setInput}
+            onReset={handleReset}
+            shareUrl={shareUrl}
+            computedPowerW={results.costs.computedPowerW}
+          />
         </aside>
         <div className="area-details">
           <CumulativeChart rows={results.costs.rows} />

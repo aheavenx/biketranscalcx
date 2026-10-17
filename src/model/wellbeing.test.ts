@@ -11,7 +11,7 @@ describe('computeWellbeing', () => {
 
   it('reports yearly net kcal and its body-fat equivalent', () => {
     const result = computeWellbeing(DEFAULT_INPUTS);
-    expect(result.netKcalPerYear).toBeCloseTo(70702.7, 1);
-    expect(result.fatEquivalentKg).toBeCloseTo(9.182, 3);
+    expect(result.netKcalPerYear).toBeCloseTo(60592.3, 1);
+    expect(result.fatEquivalentKg).toBeCloseTo(7.869, 3);
   });
 });

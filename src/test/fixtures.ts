@@ -20,11 +20,12 @@ const costs: CostResults = {
   kmPerYear: 3680,
   ticketStrategy: 'pass',
   netKcalPerTrip: 150,
+  computedPowerW: 84.3,
   rows,
   totals: { transitTrue: 9490, bikeTrue: 9042, transitMoney: 1440, bikeMoney: 1762, savings: 448 },
   perMonth: { transitTrue: 395.42, bikeTrue: 376.75 },
   hoursPerYear: { transit: 268.3, bike: 242.8 },
-  bike: { upfront: 800, bikesBought: 1, residualValue: 578 },
+  bike: { upfront: 800, bikesBought: 1 },
   paybackMonths: null,
   breakEvenYear: 1,
 };

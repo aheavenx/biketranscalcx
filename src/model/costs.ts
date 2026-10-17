@@ -1,7 +1,21 @@
-import { bikesBought, capitalCostForYear, residualValueAtHorizon } from './bike';
-import { netKcalPerTrip } from './calories';
+import { bikesBought, capitalCostForYear } from './bike';
+import { computedPowerW, netKcalPerTrip } from './calories';
 import { kmPerYear, rideMinutesPerTrip, tripsPerYear } from './commute';
 import type { CostResults, CumulativeTotals, Inputs, TicketStrategy, YearRow } from './types';
+
+/** Raw skinless chicken breast and dry white rice (USDA FoodData Central). */
+export const CHICKEN_KCAL_PER_KG = 1200;
+export const RICE_KCAL_PER_KG = 3600;
+/** Share of the extra calories eaten as chicken (protein); the rest is eaten as rice (carbs). */
+export const CHICKEN_KCAL_SHARE = 0.5;
+
+/** Cost of eating back one kcal burned, bought as chicken breast and rice. */
+export function foodCostPerKcal(inputs: Inputs): number {
+  return (
+    (CHICKEN_KCAL_SHARE * inputs.chickenPricePerKg) / CHICKEN_KCAL_PER_KG +
+    ((1 - CHICKEN_KCAL_SHARE) * inputs.ricePricePerKg) / RICE_KCAL_PER_KG
+  );
+}
 
 /** Cheaper of 12 monthly passes or a single ticket per trip; ties go to the pass. */
 export function annualTickets(inputs: Inputs): { cost: number; strategy: TicketStrategy } {
@@ -16,7 +30,7 @@ export function computeCosts(inputs: Inputs): CostResults {
   const transitHours = (trips * inputs.transitMinutes) / 60;
   const bikeHours = (trips * (rideMinutesPerTrip(inputs) + inputs.showerMinutesPerTrip)) / 60;
   const kcalPerTrip = netKcalPerTrip(inputs);
-  const food = ((trips * kcalPerTrip) / inputs.kcalPerMeal) * inputs.mealPrice;
+  const food = trips * kcalPerTrip * foodCostPerKcal(inputs);
   const care = inputs.bikeCarePerYear;
   const transitTime = transitHours * inputs.valueOfTimePerHour;
   const bikeTime = bikeHours * inputs.valueOfTimePerHour;
@@ -49,15 +63,12 @@ export function computeCosts(inputs: Inputs): CostResults {
     kmPerYear: kmPerYear(inputs),
     ticketStrategy: tickets.strategy,
     netKcalPerTrip: kcalPerTrip,
+    computedPowerW: computedPowerW(inputs),
     rows,
     totals: { ...running, savings: running.transitTrue - running.bikeTrue },
     perMonth: { transitTrue: running.transitTrue / months, bikeTrue: running.bikeTrue / months },
     hoursPerYear: { transit: transitHours, bike: bikeHours },
-    bike: {
-      upfront: inputs.bikePrice,
-      bikesBought: bikesBought(inputs),
-      residualValue: residualValueAtHorizon(inputs),
-    },
+    bike: { upfront: inputs.bikePrice, bikesBought: bikesBought(inputs) },
     paybackMonths,
     breakEvenYear: rows.find((row) => row.cumulative.bikeTrue <= row.cumulative.transitTrue)?.year ?? null,
   };

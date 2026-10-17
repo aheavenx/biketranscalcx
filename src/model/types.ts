@@ -10,7 +10,6 @@ export interface Inputs {
   singleTicket: number;
   monthlyPass: number;
   bikePrice: number;
-  depreciationPct: number;
   replaceEveryYears: number;
   bikeCarePerYear: number;
   bikeSpeedKmh: number;
@@ -21,12 +20,15 @@ export interface Inputs {
   weightKg: number;
   fitness: FitnessLevel;
   valueOfTimePerHour: number;
-  mealPrice: number;
-  kcalPerMeal: number;
+  chickenPricePerKg: number;
+  ricePricePerKg: number;
   cyclistFatalityPerBillionKm: number;
+  /** Own average riding power in watts; null uses the computed estimate. */
+  avgPowerW: number | null;
 }
 
 export type NumericInputKey = { [K in keyof Inputs]: Inputs[K] extends number ? K : never }[keyof Inputs];
+export type OptionalNumericInputKey = 'avgPowerW';
 export type SelectInputKey = 'sex' | 'fitness';
 export type SetInput = <K extends keyof Inputs>(key: K, value: Inputs[K]) => void;
 
@@ -52,11 +54,13 @@ export interface CostResults {
   kmPerYear: number;
   ticketStrategy: TicketStrategy;
   netKcalPerTrip: number;
+  /** Physics estimate of average riding power, shown when the rider has not entered their own. */
+  computedPowerW: number;
   rows: YearRow[];
   totals: CumulativeTotals & { savings: number };
   perMonth: { transitTrue: number; bikeTrue: number };
   hoursPerYear: { transit: number; bike: number };
-  bike: { upfront: number; bikesBought: number; residualValue: number };
+  bike: { upfront: number; bikesBought: number };
   /** Months until money savings repay the bike price; null if money savings are not positive. */
   paybackMonths: number | null;
   /** First year in which the cumulative bike true cost is at or below transit; null if never. */

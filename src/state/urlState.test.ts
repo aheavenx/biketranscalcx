@@ -11,6 +11,11 @@ describe('inputsToSearch', () => {
   it('writes only changed fields, in field order', () => {
     expect(inputsToSearch({ ...DEFAULT_INPUTS, sex: 'female', tripsPerWeek: 5 })).toBe('tw=5&sx=female');
   });
+
+  it('writes an entered own power and omits a blank one', () => {
+    expect(inputsToSearch({ ...DEFAULT_INPUTS, avgPowerW: 150 })).toBe('pw=150');
+    expect(inputsToSearch({ ...DEFAULT_INPUTS, avgPowerW: null })).toBe('');
+  });
 });
 
 describe('inputsFromSearch', () => {
@@ -21,12 +26,19 @@ describe('inputsFromSearch', () => {
       distanceKm: 12.5,
       fitness: 'athlete',
       valueOfTimePerHour: 0,
+      avgPowerW: 142.5,
     };
     expect(inputsFromSearch(`?${inputsToSearch(inputs)}`)).toEqual(inputs);
   });
 
   it('falls back to defaults for invalid values per field', () => {
     expect(inputsFromSearch('?tw=abc&dk=999&sx=robot&hy=7&ag=')).toEqual({ ...DEFAULT_INPUTS, horizonYears: 7 });
+  });
+
+  it('leaves own power blank when the param is missing, empty or out of range', () => {
+    expect(inputsFromSearch('?pw=').avgPowerW).toBeNull();
+    expect(inputsFromSearch('?pw=5').avgPowerW).toBeNull();
+    expect(inputsFromSearch('?pw=abc&hy=7')).toEqual({ ...DEFAULT_INPUTS, horizonYears: 7 });
   });
 
   it('rejects fractions for whole-number fields', () => {
@@ -54,5 +66,11 @@ describe('sanitizeInputs', () => {
       tripsPerWeek: 4,
       sex: 'male',
     });
+  });
+
+  it('keeps a stored own power and treats null or junk as blank', () => {
+    expect(sanitizeInputs({ avgPowerW: 180 }).avgPowerW).toBe(180);
+    expect(sanitizeInputs({ avgPowerW: null }).avgPowerW).toBeNull();
+    expect(sanitizeInputs({ avgPowerW: 'fast' }).avgPowerW).toBeNull();
   });
 });

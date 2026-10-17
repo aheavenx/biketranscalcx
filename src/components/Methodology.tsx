@@ -6,6 +6,7 @@ export const SOURCES = [
   'Jackson A.S. et al. (1990). Prediction of functional aerobic capacity without exercise testing. Med Sci Sports Exerc 22:863–870.',
   'Hendriksen I.J.M. et al. (2000). Effect of commuter cycling on physical performance of male and female employees. Med Sci Sports Exerc 32:504–510.',
   'Mifflin M.D., St Jeor S.T. et al. (1990). A new predictive equation for resting energy expenditure in healthy individuals. Am J Clin Nutr 51:241–247.',
+  'USDA FoodData Central (SR Legacy). Chicken, broilers or fryers, breast, meat only, raw: 120 kcal/100 g; Rice, white, medium-grain, raw: 360 kcal/100 g.',
   'Du Bois D., Du Bois E.F. (1916). A formula to estimate the approximate surface area if height and weight be known. Arch Intern Med 17:863–871.',
   'WHO (2020). Guidelines on physical activity and sedentary behaviour.',
   'Martin A., Goryakin Y., Suhrcke M. (2014). Does active commuting improve psychological wellbeing? Prev Med 69:296–303.',
@@ -28,13 +29,14 @@ export function Methodology() {
             <strong>Tickets</strong> are the cheaper of 12 monthly passes or a single ticket for every trip.
           </li>
           <li>
-            <strong>Bike depreciation</strong> is the value the bike loses each year at your depreciation rate. A
-            replaced bike is sold at its remaining value, and the bike you finish with keeps its value.
+            <strong>Bike purchase</strong> is the full bike price in the year you buy it, and again each time you
+            replace it. Old bikes are not resold.
           </li>
           <li>
-            <strong>Extra food</strong> comes from a physics model of riding power (rolling resistance, air drag scaled
-            by body size, ×1.25 for city stop-and-go), divided by a fitness-dependent muscle efficiency, minus resting
-            burn (Mifflin-St Jeor).
+            <strong>Extra food</strong> comes from a physics model of riding power on a flat road with no wind
+            (rolling resistance of commuter tyres, air drag scaled by body size, ×1.1 for city stop-and-go), or your
+            own average power if you enter one. Power is divided by a fitness-dependent muscle efficiency, minus
+            resting burn (Mifflin-St Jeor). Half the extra calories are eaten back as chicken breast and half as rice.
           </li>
           <li>
             <strong>Life expectancy</strong> follows WHO HEAT: 10% lower risk of death per 100 minutes of cycling a

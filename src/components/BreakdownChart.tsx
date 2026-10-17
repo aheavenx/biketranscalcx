@@ -23,11 +23,11 @@ export function breakdownTotals(rows: YearRow[]): BreakdownTotals {
   };
 }
 
-/** Fixed slot order (validated palette adjacency): Time, Tickets, Depreciation, Care, Food. */
+/** Fixed slot order (validated palette adjacency): Time, Tickets, Purchase, Care, Food. */
 const CATEGORIES = [
   { key: 'time', label: 'Time', color: 'var(--series-1)' },
   { key: 'tickets', label: 'Tickets', color: 'var(--series-2)' },
-  { key: 'capital', label: 'Bike depreciation', color: 'var(--series-3)' },
+  { key: 'capital', label: 'Bike purchase', color: 'var(--series-3)' },
   { key: 'care', label: 'Bike care', color: 'var(--series-4)' },
   { key: 'food', label: 'Extra food', color: 'var(--series-5)' },
 ] as const;
@@ -91,7 +91,7 @@ export function BreakdownChart({ rows }: { rows: YearRow[] }) {
             <td>{formatEuro(totals.transit.tickets)}</td>
           </tr>
           <tr>
-            <th scope="row">Bike depreciation</th>
+            <th scope="row">Bike purchase</th>
             <td>{formatEuro(totals.bike.capital)}</td>
             <td>{dash}</td>
           </tr>

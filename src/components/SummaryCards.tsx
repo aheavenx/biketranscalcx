@@ -31,7 +31,10 @@ export function SummaryCards({ costs, horizonYears }: SummaryCardsProps) {
       : `Public transport saves ${formatEuro(-savings)} over ${period}`;
   const ticketFact =
     costs.ticketStrategy === 'pass' ? 'A monthly pass is the cheaper way' : 'Single tickets are the cheaper way';
-  const bikes = costs.bike.bikesBought === 1 ? '1 bike' : `${costs.bike.bikesBought} bikes`;
+  const bikeFact =
+    costs.bike.bikesBought === 1
+      ? `1 bike bought at ${formatEuro(costs.bike.upfront)}.`
+      : `${costs.bike.bikesBought} bikes bought at ${formatEuro(costs.bike.upfront)} each.`;
 
   return (
     <section className="summary" aria-labelledby="summary-heading">
@@ -70,9 +73,7 @@ export function SummaryCards({ costs, horizonYears }: SummaryCardsProps) {
             ? `Cycling does not become cheaper on true cost within ${period}.`
             : `Cycling is cheaper on true cost from year ${costs.breakEvenYear}.`}
         </li>
-        <li>
-          {bikes} bought; the one you finish with is worth about {formatEuro(costs.bike.residualValue)}.
-        </li>
+        <li>{bikeFact}</li>
       </ul>
     </section>
   );

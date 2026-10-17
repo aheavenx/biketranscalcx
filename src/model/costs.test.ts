@@ -29,10 +29,11 @@ describe('computeCosts with defaults', () => {
     const first = costs.rows[0];
     expect(first.transit.tickets).toBe(720);
     expect(first.transit.time).toBeCloseTo(4025, 6);
-    expect(first.bike.capital).toBeCloseTo(120, 6);
+    expect(first.bike.capital).toBe(800);
     expect(first.bike.care).toBe(120);
-    expect(first.bike.food).toBeCloseTo(652.64, 2);
+    expect(first.bike.food).toBeCloseTo(269.3, 2);
     expect(first.bike.time).toBeCloseTo(3641.667, 3);
+    expect(costs.rows[1].bike.capital).toBe(0);
   });
 
   it('accumulates running totals', () => {
@@ -47,10 +48,10 @@ describe('computeCosts with defaults', () => {
 
   it('computes totals, savings and per-month figures', () => {
     expect(costs.totals.transitTrue).toBeCloseTo(23725, 6);
-    expect(costs.totals.bikeTrue).toBeCloseTo(22516.57, 2);
+    expect(costs.totals.bikeTrue).toBeCloseTo(20954.83, 2);
     expect(costs.totals.transitMoney).toBeCloseTo(3600, 6);
-    expect(costs.totals.bikeMoney).toBeCloseTo(4308.24, 2);
-    expect(costs.totals.savings).toBeCloseTo(1208.43, 2);
+    expect(costs.totals.bikeMoney).toBeCloseTo(2746.5, 2);
+    expect(costs.totals.savings).toBeCloseTo(2770.17, 2);
     expect(costs.perMonth.transitTrue).toBeCloseTo(395.417, 3);
   });
 
@@ -58,19 +59,31 @@ describe('computeCosts with defaults', () => {
     expect(costs.tripsPerYear).toBe(460);
     expect(costs.kmPerYear).toBe(3680);
     expect(costs.ticketStrategy).toBe('pass');
+    expect(costs.computedPowerW).toBeCloseTo(84.3, 2);
     expect(costs.hoursPerYear.transit).toBeCloseTo(268.333, 3);
     expect(costs.hoursPerYear.bike).toBeCloseTo(242.778, 3);
   });
 
   it('reports bike purchase facts', () => {
-    expect(costs.bike.upfront).toBe(800);
-    expect(costs.bike.bikesBought).toBe(1);
-    expect(costs.bike.residualValue).toBeCloseTo(354.964, 3);
+    expect(costs.bike).toEqual({ upfront: 800, bikesBought: 1 });
   });
 
-  it('breaks even in year 1 but never pays back on money alone', () => {
-    expect(costs.breakEvenYear).toBe(1);
-    expect(costs.paybackMonths).toBeNull();
+  it('breaks even in year 2 and pays the bike back from money savings', () => {
+    expect(costs.breakEvenYear).toBe(2);
+    expect(costs.paybackMonths).toBeCloseTo(29.03, 2);
+  });
+});
+
+describe('computeCosts food', () => {
+  // Defaults burn 60,592 extra kcal a year; half is bought as chicken (1,200 kcal/kg), half as rice (3,600 kcal/kg).
+  it('buys half the extra calories as chicken breast', () => {
+    const costs = computeCosts({ ...DEFAULT_INPUTS, chickenPricePerKg: 12, ricePricePerKg: 0 });
+    expect(costs.rows[0].bike.food).toBeCloseTo(302.96, 2);
+  });
+
+  it('buys the other half as rice', () => {
+    const costs = computeCosts({ ...DEFAULT_INPUTS, chickenPricePerKg: 0, ricePricePerKg: 3.6 });
+    expect(costs.rows[0].bike.food).toBeCloseTo(30.3, 2);
   });
 });
 
@@ -78,7 +91,7 @@ describe('computeCosts edge cases', () => {
   it('computes payback when money savings are positive', () => {
     const costs = computeCosts({ ...DEFAULT_INPUTS, monthlyPass: 200 });
     expect(costs.ticketStrategy).toBe('single');
-    expect(costs.paybackMonths).toBeCloseTo(15.806, 2);
+    expect(costs.paybackMonths).toBeCloseTo(9.69, 2);
   });
 
   it('pays back immediately for a free bike', () => {
@@ -86,9 +99,10 @@ describe('computeCosts edge cases', () => {
   });
 
   it('never breaks even when time is free and the bike costs more money', () => {
-    const costs = computeCosts({ ...DEFAULT_INPUTS, valueOfTimePerHour: 0 });
+    const costs = computeCosts({ ...DEFAULT_INPUTS, valueOfTimePerHour: 0, monthlyPass: 30 });
     expect(costs.breakEvenYear).toBeNull();
-    expect(costs.totals.savings).toBeCloseTo(-708.24, 2);
+    expect(costs.paybackMonths).toBeNull();
+    expect(costs.totals.savings).toBeCloseTo(-946.5, 2);
   });
 
   it('handles zero trips without NaN', () => {

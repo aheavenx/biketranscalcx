@@ -2,6 +2,9 @@
 
 Date: 2026-10-17
 Status: approved in brainstorming, pending written-spec review
+Revised: 2026-10-17 — food priced as chicken breast + rice instead of meals; bike depreciation
+removed (purchases are cash costs); stop-and-go factor 1.1 on a flat, windless road; fitness-level
+hints; optional own average power in a collapsed "Geeky stats" section.
 
 ## 1. Purpose
 
@@ -35,7 +38,6 @@ All money in €, all units metric. Each input has a default, a valid range, and
 | Transit | `singleTicket` | € | 3.00 | 0–50 |
 | | `monthlyPass` | € | 60 | 0–1000 |
 | Bike | `bikePrice` | € | 800 | 0–20000 |
-| | `depreciationPct` | %/yr | 15 | 0–60 |
 | | `replaceEveryYears` | years | 8 | 1–30 (integer) |
 | | `bikeCarePerYear` | €/yr | 120 | 0–5000 |
 | | `bikeSpeedKmh` | km/h | 18 | 5–45 |
@@ -46,13 +48,19 @@ All money in €, all units metric. Each input has a default, a valid range, and
 | | `weightKg` | kg | 75 | 35–200 |
 | | `fitness` | `sedentary` \| `light` \| `moderate` \| `active` \| `athlete` | `moderate` | enum |
 | | `valueOfTimePerHour` | €/h | 15 | 0–500 |
-| | `mealPrice` | € | 6 | 0–100 |
-| | `kcalPerMeal` | kcal | 650 | 200–2000 |
+| | `chickenPricePerKg` | €/kg | 10 | 0–100 |
+| | `ricePricePerKg` | €/kg | 2 | 0–50 |
 | Advanced (collapsed) | `cyclistFatalityPerBillionKm` | deaths / 10⁹ km | 15 | 0–200 |
+| Geeky stats (collapsed) | `avgPowerW` (own average power, optional) | W | blank = computed | 10–1000 |
 
 UI hints:
 - `showerMinutesPerTrip`: "e.g. a 10-min shower after each arrival at work ≈ 5 min per one-way trip".
 - `cyclistFatalityPerBillionKm`: "≈ 8 Netherlands, ≈ 21 UK (ITF/IRTAD 2011–2015)".
+- `ricePricePerKg`: the extra calories are eaten back half as chicken, half as rice.
+- `fitness`: a one-line hint for the selected level, describing the Jackson activity rating it maps
+  to (§5.2) — e.g. moderately active = "more than 1 hour a week of moderate exercise".
+- `avgPowerW`: blank shows the computed power as placeholder and in the hint ("Computed: 84 W");
+  clearing the field returns to the computed value.
 
 ## 4. Cost model (`src/model/costs.ts`, `bike.ts`, `calories.ts`)
 
@@ -72,32 +80,34 @@ All figures are in today's money (no inflation). Computed per projection year `y
 
 ### 4.3 Bike (per year)
 
-- **Capital (economic depreciation).** Declining balance with rate `d = depreciationPct / 100`.
-  The bike in use in year `y` has age `k = ((y − 1) mod replaceEveryYears) + 1` at year end.
-  Capital cost in year `y` = `P·(1−d)^(k−1) − P·(1−d)^k`, `P = bikePrice`.
-  At replacement the old bike is sold at its depreciated value and a new one bought at `P`, so the
-  swap adds no economic cost beyond depreciation. Also reported: upfront cash outlay `P`, number of
-  bikes bought within the horizon (`ceil(horizonYears / replaceEveryYears)`), residual value at the
-  horizon end.
+- **Purchase (cash, no depreciation).** The full price `P = bikePrice` in every year a bike is
+  bought — year 1 and each replacement, i.e. when `(y − 1) mod replaceEveryYears = 0` — otherwise 0.
+  Old bikes are not resold and the bike you finish with carries no residual value. Also reported:
+  upfront price `P` and number of bikes bought within the horizon
+  (`ceil(horizonYears / replaceEveryYears)`).
 - **Care** = `bikeCarePerYear`.
-- **Food** = `T × netKcalPerTrip / kcalPerMeal × mealPrice`.
+- **Food** = `T × netKcalPerTrip × (0.5 × chickenPricePerKg / 1200 + 0.5 × ricePricePerKg / 3600)`:
+  half the extra kcal bought as raw chicken breast (1,200 kcal/kg), half as dry white rice
+  (3,600 kcal/kg), per USDA FoodData Central.
 - **Time** = `T × (distanceKm / bikeSpeedKmh × 60 + showerMinutesPerTrip) / 60` hours → time cost.
 
 ### 4.4 Calories (physics model)
 
-Constants: bike mass 15 kg, `g = 9.81`, `Crr = 0.008`, air density `ρ = 1.2 kg/m³`,
-reference `CdA = 0.55 m²` at body surface area 1.9 m², urban factor 1.25.
+Assumes a flat road with no wind on commuter tyres. Constants: bike mass 15 kg, `g = 9.81`,
+`Crr = 0.008`, air density `ρ = 1.2 kg/m³`, reference `CdA = 0.55 m²` at body surface area 1.9 m²,
+stop-and-go factor 1.1.
 
 - Body surface area (Du Bois): `BSA = 0.007184 × W^0.425 × H^0.725` (W kg, H cm).
 - `CdA = 0.55 × BSA / 1.9`.
 - `v = bikeSpeedKmh / 3.6`, `m = weightKg + 15`.
-- Mechanical power `P_mech = (Crr·m·g·v + ½·ρ·CdA·v³) × 1.25` (W).
+- Computed power `P_calc = (Crr·m·g·v + ½·ρ·CdA·v³) × 1.1` (W).
+- Mechanical power `P_mech = avgPowerW` when entered (already includes stops), else `P_calc`.
 - Gross efficiency by fitness: sedentary 0.18, light 0.19, moderate 0.20, active 0.215, athlete 0.23.
 - Metabolic power `P_met = P_mech / efficiency`; gross kcal/h = `P_met × 3600 / 4184`.
 - Resting kcal/h from Mifflin-St Jeor BMR / 24:
   `BMR = 10W + 6.25H − 5·age + s`, `s = +5` male, `−161` female, `−78` unspecified.
 - Net kcal/h = gross − resting (floored at 0). Net kcal per trip = net kcal/h × ride hours per trip.
-- Sanity target: defaults give ≈ 340 kcal/h net, ≈ 150 kcal per trip.
+- Sanity target: defaults give ≈ 84 W, ≈ 296 kcal/h net, ≈ 132 kcal per trip, ≈ €269/yr food.
 
 ### 4.5 Outputs
 
@@ -166,7 +176,7 @@ src/
     types.ts        Inputs, Results, YearRow, enums
     defaults.ts     DEFAULT_INPUTS, FIELD_SPECS (range, unit, url key, label, hint)
     calories.ts     BSA, CdA, power, efficiency, BMR, net kcal/trip
-    bike.ts         depreciation/replacement schedule
+    bike.ts         purchase/replacement schedule
     costs.ts        transit & bike annual rows, cumulative totals, payback, break-even
     mortality.ts    Gompertz-Makeham, HEAT, crash risk, LE deltas
     fitness.ts      Jackson VO2max, trajectories, fitness age
@@ -202,14 +212,15 @@ headline first. Every chart's key numbers also appear as text.
 - localStorage key `bikecalcx:inputs:v1`; every access wrapped in try/catch; URL params take
   precedence over stored values.
 - "Copy share link" (Clipboard API, with visible confirmation) and "Reset to defaults".
-- Model functions guard against division by zero (e.g. `T = 0`, `kcalPerMeal` floor via range).
+- Model functions guard against division by zero (e.g. `T = 0`).
+- Optional fields (`avgPowerW`) are `null` when blank; blank is valid, and an invalid draft keeps
+  the last valid value like any other field.
 
 ## 8. Testing
 
 Test-first with Vitest:
 - `calories`: BSA for a known case; net kcal/h for defaults within 300–380; efficiency ordering.
-- `bike`: total depreciation over a horizon equals `P − residual` without replacement; with
-  replacement equals the sum per bike cycle; `d = 0` → 0.
+- `bike`: full price in purchase years, 0 in between; bikes bought counts replacements.
 - `costs`: ticket strategy choice both ways; `T = 0`; cumulative sums; payback and break-even.
 - `mortality`: LE at birth matches targets ±0.3; 45 % cap; no benefit outside ages 20–64;
   crash risk lowers LE; `net = activityGain − crashLoss`.
@@ -238,6 +249,8 @@ importing the repo in Vercel (framework preset: Vite). No deploy is performed as
 - Mifflin M.D., St Jeor S.T. et al. (1990). A new predictive equation for resting energy
   expenditure. *Am J Clin Nutr* 51:241–247.
 - Du Bois D., Du Bois E.F. (1916). A formula to estimate the approximate surface area.
+- USDA FoodData Central (SR Legacy): chicken breast, meat only, raw (120 kcal/100 g); white rice,
+  medium-grain, raw (360 kcal/100 g).
 - WHO (2020). Guidelines on physical activity and sedentary behaviour.
 - Martin A., Goryakin Y., Suhrcke M. (2014). Does active commuting improve psychological
   wellbeing? *Prev Med* 69:296–303.

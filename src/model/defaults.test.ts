@@ -14,10 +14,12 @@ describe('FIELD_SPECS', () => {
 
   it('has defaults that are valid for their own specs', () => {
     for (const spec of FIELD_SPECS) {
-      const valid =
-        spec.kind === 'number'
-          ? isValidNumber(spec, DEFAULT_INPUTS[spec.key])
-          : isValidSelect(spec, DEFAULT_INPUTS[spec.key]);
+      let valid: boolean;
+      if (spec.kind === 'number') valid = isValidNumber(spec, DEFAULT_INPUTS[spec.key]);
+      else if (spec.kind === 'optionalNumber') {
+        const value = DEFAULT_INPUTS[spec.key];
+        valid = value === null || isValidNumber(spec, value);
+      } else valid = isValidSelect(spec, DEFAULT_INPUTS[spec.key]);
       expect(valid, spec.key).toBe(true);
     }
   });

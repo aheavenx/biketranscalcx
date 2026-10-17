@@ -9,8 +9,8 @@ export const AIR_DENSITY = 1.2;
 /** Drag area (m²) of an upright commuter whose body surface area is REFERENCE_BSA. */
 export const REFERENCE_CDA = 0.55;
 export const REFERENCE_BSA = 1.9;
-/** Extra work from stopping, accelerating and small hills in city riding. */
-export const URBAN_FACTOR = 1.25;
+/** Extra work from stopping and accelerating in city traffic; the road is assumed flat with no wind. */
+export const STOP_AND_GO_FACTOR = 1.1;
 const JOULES_PER_KCAL = 4184;
 
 /** Gross efficiency of cycling: trained riders turn more of the energy they burn into work. */
@@ -30,14 +30,19 @@ export function bodySurfaceArea(weightKg: number, heightCm: number): number {
   return 0.007184 * weightKg ** 0.425 * heightCm ** 0.725;
 }
 
-/** Mechanical power (W) to ride at the input speed on flat ground, including the urban factor. */
-export function mechanicalPowerW(inputs: Inputs): number {
+/** Mechanical power (W) to ride at the input speed on a flat road with no wind, including stop-and-go. */
+export function computedPowerW(inputs: Inputs): number {
   const speed = inputs.bikeSpeedKmh / 3.6;
   const mass = inputs.weightKg + BIKE_MASS_KG;
   const dragArea = (REFERENCE_CDA * bodySurfaceArea(inputs.weightKg, inputs.heightCm)) / REFERENCE_BSA;
   const rolling = ROLLING_RESISTANCE * mass * GRAVITY * speed;
   const aero = 0.5 * AIR_DENSITY * dragArea * speed ** 3;
-  return (rolling + aero) * URBAN_FACTOR;
+  return (rolling + aero) * STOP_AND_GO_FACTOR;
+}
+
+/** The rider's own average power when entered (e.g. from a power meter), otherwise the computed estimate. */
+export function averagePowerW(inputs: Inputs): number {
+  return inputs.avgPowerW ?? computedPowerW(inputs);
 }
 
 /** Mifflin-St Jeor resting energy expenditure, per hour. */
@@ -47,7 +52,7 @@ export function restingKcalPerHour(inputs: Inputs): number {
 }
 
 export function grossKcalPerHour(inputs: Inputs): number {
-  const metabolicWatts = mechanicalPowerW(inputs) / GROSS_EFFICIENCY[inputs.fitness];
+  const metabolicWatts = averagePowerW(inputs) / GROSS_EFFICIENCY[inputs.fitness];
   return (metabolicWatts * 3600) / JOULES_PER_KCAL;
 }
 

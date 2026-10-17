@@ -2,15 +2,17 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_INPUTS } from '../model/defaults';
+import type { Inputs } from '../model/types';
 import { InputPanel } from './InputPanel';
 import { parseNumber } from './NumberField';
 
-function setup() {
+function setup(overrides: Partial<Inputs> = {}) {
   const props = {
-    inputs: DEFAULT_INPUTS,
+    inputs: { ...DEFAULT_INPUTS, ...overrides },
     setInput: vi.fn(),
     onReset: vi.fn(),
     shareUrl: 'https://example.com/?tw=6',
+    computedPowerW: 84.3,
   };
   const user = userEvent.setup();
   render(<InputPanel {...props} />);
@@ -74,6 +76,20 @@ describe('InputPanel', () => {
     expect(setInput).toHaveBeenCalledWith('fitness', 'athlete');
   });
 
+  it('explains the selected fitness level', () => {
+    setup();
+    expect(screen.getByLabelText(/fitness level/i)).toHaveAccessibleDescription(
+      'More than 1 hour a week of moderate exercise.',
+    );
+  });
+
+  it('explains other fitness levels', () => {
+    setup({ fitness: 'athlete' });
+    expect(screen.getByLabelText(/fitness level/i)).toHaveAccessibleDescription(
+      'More than 3 hours a week of hard training.',
+    );
+  });
+
   it('resets', async () => {
     const { user, onReset } = setup();
     await user.click(screen.getByRole('button', { name: /reset to defaults/i }));
@@ -85,5 +101,44 @@ describe('InputPanel', () => {
     await user.click(screen.getByRole('button', { name: /copy share link/i }));
     expect(await screen.findByText('Link copied')).toBeInTheDocument();
     await expect(navigator.clipboard.readText()).resolves.toBe('https://example.com/?tw=6');
+  });
+});
+
+describe('InputPanel geeky stats', () => {
+  const powerField = () => screen.getByLabelText(/average power per trip/i);
+
+  it('puts own power in a collapsed Geeky stats section', () => {
+    setup();
+    const section = screen.getByText('Geeky stats').closest('details');
+    expect(section).not.toHaveAttribute('open');
+    expect(section).toContainElement(powerField());
+  });
+
+  it('shows the computed power while own power is blank', () => {
+    setup();
+    expect(powerField()).toHaveValue('');
+    expect(powerField()).toHaveAttribute('placeholder', '84');
+    expect(powerField()).toHaveAccessibleDescription(expect.stringContaining('Computed: 84 W.'));
+  });
+
+  it('reports an entered own power', async () => {
+    const { user, setInput } = setup();
+    await user.type(powerField(), '150');
+    expect(setInput).toHaveBeenLastCalledWith('avgPowerW', 150);
+  });
+
+  it('goes back to the computed power when cleared', async () => {
+    const { user, setInput } = setup({ avgPowerW: 150 });
+    expect(powerField()).toHaveValue('150');
+    await user.clear(powerField());
+    expect(setInput).toHaveBeenLastCalledWith('avgPowerW', null);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('rejects an out-of-range own power', async () => {
+    const { user, setInput } = setup();
+    await user.type(powerField(), '5');
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter a number from 10 to 1000');
+    expect(setInput).not.toHaveBeenCalled();
   });
 });

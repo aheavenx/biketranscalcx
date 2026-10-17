@@ -25,7 +25,7 @@ export function LifeExpectancy({ lifeExpectancy: le, age, horizonYears }: LifeEx
           <dd>{formatLifeDelta(-le.crashLossYears)}</dd>
         </div>
         <div>
-          <dt>Lower risk of death while commuting</dt>
+          <dt>Lower all-cause death risk in commuting years (ages 20–64)</dt>
           <dd>{formatNumber(le.riskReduction * 100)}%</dd>
         </div>
         <div>

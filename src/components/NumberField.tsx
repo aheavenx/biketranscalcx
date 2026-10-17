@@ -4,7 +4,9 @@ import type { NumberFieldSpec } from '../model/defaults';
 
 /** Parses user text, accepting a decimal comma; blank text is NaN. */
 export function parseNumber(text: string): number {
-  const trimmed = text.trim().replace(',', '.');
+  const raw = text.trim();
+  if (/^\d{1,3}(,\d{3})+$/.test(raw)) return Number.NaN; // thousands separator, not a decimal comma
+  const trimmed = raw.replace(',', '.');
   return trimmed === '' ? Number.NaN : Number(trimmed);
 }
 

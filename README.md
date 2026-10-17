@@ -6,7 +6,7 @@ and well-being). Inputs are saved in the URL, so any scenario can be shared as a
 
 ## Develop
 
-Requires Node 22.22+ or 24.15+ (the test tooling — jsdom 30 and jest-dom 7 — needs it; the Vite build alone runs on Node 20.19+).
+Requires Node 22.22.2+ or 24.15+ (the test tooling — jsdom 30 and jest-dom 7 — needs it; the Vite build alone runs on Node 20.19+).
 
 ```bash
 npm install

@@ -106,7 +106,7 @@ reference `CdA = 0.55 m²` at body surface area 1.9 m², urban factor 1.25.
 - Headline: total true cost over the horizon per mode, savings (transit − bike), per-month
   equivalents (`total / (horizonYears × 12)`).
 - Cash payback: months for the upfront bike price to be recovered by monthly cash savings
-  `(transit tickets − bike care − bike food) / 12`; "never" if savings ≤ 0.
+  `(transit tickets − bike care − bike food) / 12`; "never" if savings ≤ 0. A bike price of €0 pays back immediately (0 months), whatever the savings.
 - Break-even year on true cost: first year whose cumulative bike true cost ≤ transit true cost, or
   "not within horizon".
 - Hours per year spent commuting per mode.

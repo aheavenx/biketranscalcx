@@ -51,7 +51,10 @@ export function BreakdownChart({ rows }: { rows: YearRow[] }) {
             <XAxis type="number" tickFormatter={(value: number) => formatEuroCompact(value)} {...AXIS_PROPS} />
             <YAxis type="category" dataKey="mode" width={120} {...AXIS_PROPS} />
             <Tooltip formatter={(value) => formatEuro(Number(value))} cursor={{ fill: 'var(--hover)' }} {...TOOLTIP_PROPS} />
-            <Legend formatter={renderLegendLabel} />
+            <Legend
+              formatter={renderLegendLabel}
+              itemSorter={(item) => CATEGORIES.findIndex((category) => category.key === item.dataKey)}
+            />
             {CATEGORIES.map((category) => (
               <Bar
                 key={category.key}

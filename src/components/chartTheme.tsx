@@ -1,6 +1,6 @@
 export const AXIS_PROPS = {
   stroke: 'var(--axis)',
-  tick: { fill: 'var(--text-muted)', fontSize: 12 },
+  tick: { fill: 'var(--text-secondary)', fontSize: 12 },
   tickLine: false,
 } as const;
 

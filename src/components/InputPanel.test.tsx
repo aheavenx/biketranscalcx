@@ -20,6 +20,9 @@ function setup() {
 describe('parseNumber', () => {
   it('accepts a decimal comma and rejects blanks', () => {
     expect(parseNumber('7,5')).toBe(7.5);
+    expect(parseNumber('1,500')).toBeNaN();
+    expect(parseNumber('12,000')).toBeNaN();
+    expect(parseNumber('1,25')).toBe(1.25);
     expect(parseNumber(' 12 ')).toBe(12);
     expect(parseNumber('')).toBeNaN();
   });

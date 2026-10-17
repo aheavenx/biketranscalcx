@@ -1,0 +1,86 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { DEFAULT_INPUTS } from '../model/defaults';
+import { InputPanel } from './InputPanel';
+import { parseNumber } from './NumberField';
+
+function setup() {
+  const props = {
+    inputs: DEFAULT_INPUTS,
+    setInput: vi.fn(),
+    onReset: vi.fn(),
+    shareUrl: 'https://example.com/?tw=6',
+  };
+  const user = userEvent.setup();
+  render(<InputPanel {...props} />);
+  return { ...props, user };
+}
+
+describe('parseNumber', () => {
+  it('accepts a decimal comma and rejects blanks', () => {
+    expect(parseNumber('7,5')).toBe(7.5);
+    expect(parseNumber(' 12 ')).toBe(12);
+    expect(parseNumber('')).toBeNaN();
+  });
+});
+
+describe('InputPanel', () => {
+  it('shows current values', () => {
+    setup();
+    expect(screen.getByRole('slider')).toHaveValue('5');
+    expect(screen.getByLabelText(/one-way distance/i)).toHaveValue('8');
+    expect(screen.getByLabelText(/^sex/i)).toHaveValue('unspecified');
+  });
+
+  it('reports valid numbers', async () => {
+    const { user, setInput } = setup();
+    const field = screen.getByLabelText(/one-way distance/i);
+    await user.clear(field);
+    await user.type(field, '12');
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 12);
+  });
+
+  it('accepts a decimal comma', async () => {
+    const { user, setInput } = setup();
+    const field = screen.getByLabelText(/one-way distance/i);
+    await user.clear(field);
+    await user.type(field, '7,5');
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 7.5);
+  });
+
+  it('shows an error and does not report out-of-range values', async () => {
+    const { user, setInput } = setup();
+    const field = screen.getByLabelText(/one-way distance/i);
+    await user.clear(field);
+    await user.type(field, '999');
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter a number from 0.5 to 60');
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(setInput).not.toHaveBeenCalledWith('distanceKm', 999);
+  });
+
+  it('reports slider changes', () => {
+    const { setInput } = setup();
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '12' } });
+    expect(setInput).toHaveBeenCalledWith('horizonYears', 12);
+  });
+
+  it('reports select changes', async () => {
+    const { user, setInput } = setup();
+    await user.selectOptions(screen.getByLabelText(/fitness level/i), 'athlete');
+    expect(setInput).toHaveBeenCalledWith('fitness', 'athlete');
+  });
+
+  it('resets', async () => {
+    const { user, onReset } = setup();
+    await user.click(screen.getByRole('button', { name: /reset to defaults/i }));
+    expect(onReset).toHaveBeenCalledOnce();
+  });
+
+  it('copies the share link', async () => {
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: /copy share link/i }));
+    expect(await screen.findByText('Link copied')).toBeInTheDocument();
+    await expect(navigator.clipboard.readText()).resolves.toBe('https://example.com/?tw=6');
+  });
+});

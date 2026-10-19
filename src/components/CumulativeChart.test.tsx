@@ -2,8 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { RESULTS_FIXTURE } from '../test/fixtures';
 import { CumulativeChart, cumulativeSeries } from './CumulativeChart';
+import { COST_LINES } from './chartTheme';
 
 const rows = RESULTS_FIXTURE.costs.rows;
+
+describe('COST_LINES', () => {
+  it('gives every cost line its own colour', () => {
+    expect(new Set(COST_LINES.map((line) => line.color)).size).toBe(COST_LINES.length);
+  });
+});
 
 describe('cumulativeSeries', () => {
   it('starts at zero and adds one point per year', () => {

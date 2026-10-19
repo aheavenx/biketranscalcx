@@ -20,10 +20,10 @@ export function renderLegendLabel(value: string) {
   return <span className="legend-label">{value}</span>;
 }
 
-/** The four cost series shared by the cumulative and speed charts: bike and transit, true cost and money only. */
+/** The four cost series shared by the cumulative and speed charts. Each has its own colour; money-only lines are also dashed. */
 export const COST_LINES = [
-  { key: 'bikeTrue', name: 'Bike, true cost', color: 'var(--series-bike)', dashed: false },
-  { key: 'transitTrue', name: 'Public transport, true cost', color: 'var(--series-transit)', dashed: false },
-  { key: 'bikeMoney', name: 'Bike, money only', color: 'var(--series-bike)', dashed: true },
-  { key: 'transitMoney', name: 'Public transport, money only', color: 'var(--series-transit)', dashed: true },
+  { key: 'bikeTrue', name: 'Bike, true cost', color: 'var(--series-1)', dashed: false },
+  { key: 'transitTrue', name: 'Public transport, true cost', color: 'var(--series-2)', dashed: false },
+  { key: 'bikeMoney', name: 'Bike, money only', color: 'var(--series-3)', dashed: true },
+  { key: 'transitMoney', name: 'Public transport, money only', color: 'var(--series-4)', dashed: true },
 ] as const;

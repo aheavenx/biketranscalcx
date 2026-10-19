@@ -3,14 +3,13 @@ import { computedPowerW, netKcalPerTrip } from './calories';
 import { kmPerYear, rideMinutesPerTrip, tripsPerYear } from './commute';
 import type { CostResults, CumulativeTotals, Diet, Inputs, TicketStrategy, YearRow } from './types';
 
-/** Raw skinless chicken breast (USDA FoodData Central). */
+/** Raw skinless chicken breast and dry white rice (USDA FoodData Central). */
 export const CHICKEN_KCAL_PER_KG = 1200;
-/** Halloumi (typical retail label, about 320 kcal per 100 g). */
-export const HALLOUMI_KCAL_PER_KG = 3200;
-/** Firm tofu (USDA FoodData Central). */
-export const TOFU_KCAL_PER_KG = 1440;
-/** Dry white rice (USDA FoodData Central). */
 export const RICE_KCAL_PER_KG = 3600;
+/** Halloumi, ≈320 kcal/100 g (UK CoFID 311; retail labels 312–333). */
+export const HALLOUMI_KCAL_PER_KG = 3200;
+/** Firm tofu prepared with calcium sulfate, 144 kcal/100 g (USDA FoodData Central SR Legacy 172475). */
+export const TOFU_KCAL_PER_KG = 1440;
 /** Share of the extra calories eaten as protein food; the rest is eaten as rice (carbs). */
 export const PROTEIN_KCAL_SHARE = 0.5;
 

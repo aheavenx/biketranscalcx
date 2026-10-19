@@ -1,4 +1,5 @@
 export type Sex = 'male' | 'female' | 'unspecified';
+export type Diet = 'meat' | 'vegetarian' | 'vegan';
 export type FitnessLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'athlete';
 
 export interface Inputs {
@@ -20,7 +21,10 @@ export interface Inputs {
   weightKg: number;
   fitness: FitnessLevel;
   valueOfTimePerHour: number;
+  diet: Diet;
   chickenPricePerKg: number;
+  halloumiPricePerKg: number;
+  tofuPricePerKg: number;
   ricePricePerKg: number;
   cyclistFatalityPerBillionKm: number;
   /** Own average riding power in watts; null uses the computed estimate. */
@@ -29,7 +33,7 @@ export interface Inputs {
 
 export type NumericInputKey = { [K in keyof Inputs]: Inputs[K] extends number ? K : never }[keyof Inputs];
 export type OptionalNumericInputKey = 'avgPowerW';
-export type SelectInputKey = 'sex' | 'fitness';
+export type SelectInputKey = 'sex' | 'fitness' | 'diet';
 export type SetInput = <K extends keyof Inputs>(key: K, value: Inputs[K]) => void;
 
 export type TicketStrategy = 'pass' | 'single';

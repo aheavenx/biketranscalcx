@@ -62,3 +62,17 @@ describe('rangeMessage', () => {
     expect(rangeMessage(getNumberSpec('tripsPerWeek'))).toBe('Enter a whole number from 0 to 28');
   });
 });
+
+describe('protein price visibility', () => {
+  it('shows each protein price only for its diet', () => {
+    const diets = ['meat', 'vegetarian', 'vegan'] as const;
+    const shownFor = { cp: 'meat', hp: 'vegetarian', tp: 'vegan' };
+    for (const [urlKey, shownDiet] of Object.entries(shownFor)) {
+      const spec = FIELD_SPECS.find((candidate) => candidate.urlKey === urlKey);
+      expect(spec?.visibleWhen, urlKey).toBeDefined();
+      for (const diet of diets) {
+        expect(spec?.visibleWhen?.({ ...DEFAULT_INPUTS, diet }), `${urlKey} ${diet}`).toBe(diet === shownDiet);
+      }
+    }
+  });
+});

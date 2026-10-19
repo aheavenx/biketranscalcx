@@ -112,3 +112,18 @@ describe('computeCosts edge cases', () => {
     expect(Number.isNaN(costs.totals.bikeTrue)).toBe(false);
   });
 });
+
+describe('computeCosts diet', () => {
+  it('eats back halloumi on a vegetarian diet', () => {
+    expect(computeCosts({ ...DEFAULT_INPUTS, diet: 'vegetarian' }).rows[0].bike.food).toBeCloseTo(130.44, 2);
+  });
+
+  it('eats back tofu on a vegan diet', () => {
+    expect(computeCosts({ ...DEFAULT_INPUTS, diet: 'vegan' }).rows[0].bike.food).toBeCloseTo(143.065, 2);
+  });
+
+  it("uses only the selected diet's protein price", () => {
+    const inputs = { ...DEFAULT_INPUTS, diet: 'vegan' as const, chickenPricePerKg: 99, halloumiPricePerKg: 99 };
+    expect(computeCosts(inputs).rows[0].bike.food).toBeCloseTo(143.065, 2);
+  });
+});

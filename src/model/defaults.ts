@@ -14,6 +14,8 @@ export interface NumberFieldSpec {
   step: number;
   integer: boolean;
   hint?: string;
+  /** Hides the field while this returns false; a field without it is always shown. */
+  visibleWhen?: (inputs: Inputs) => boolean;
 }
 
 /** A number that may be left blank, in which case the model computes the value itself. */
@@ -31,6 +33,7 @@ export interface SelectFieldSpec {
   group: FieldGroup;
   label: string;
   options: { value: string; label: string; hint?: string }[];
+  visibleWhen?: (inputs: Inputs) => boolean;
 }
 
 export type FieldSpec = NumberFieldSpec | OptionalNumberFieldSpec | SelectFieldSpec;
@@ -54,7 +57,10 @@ export const DEFAULT_INPUTS: Inputs = {
   weightKg: 75,
   fitness: 'moderate',
   valueOfTimePerHour: 15,
+  diet: 'meat',
   chickenPricePerKg: 10,
+  halloumiPricePerKg: 12,
+  tofuPricePerKg: 6,
   ricePricePerKg: 2,
   cyclistFatalityPerBillionKm: 15,
   avgPowerW: null,
@@ -107,8 +113,22 @@ export const FIELD_SPECS: FieldSpec[] = [
     ],
   },
   num({ key: 'valueOfTimePerHour', urlKey: 'vt', group: 'you', label: 'Value of your time', unit: '€/h', min: 0, max: 500, step: 1, integer: false, hint: 'Set to 0 to compare money only.' }),
-  num({ key: 'chickenPricePerKg', urlKey: 'cp', group: 'you', label: 'Chicken breast price', unit: '€/kg', min: 0, max: 100, step: 0.1, integer: false }),
-  num({ key: 'ricePricePerKg', urlKey: 'rp', group: 'you', label: 'Rice price', unit: '€/kg', min: 0, max: 50, step: 0.1, integer: false, hint: 'The extra calories you burn are eaten back half as chicken, half as rice.' }),
+  {
+    kind: 'select',
+    key: 'diet',
+    urlKey: 'dt',
+    group: 'you',
+    label: 'Diet',
+    options: [
+      { value: 'meat', label: 'Meat', hint: 'Extra calories are eaten back half as chicken breast, half as rice.' },
+      { value: 'vegetarian', label: 'Vegetarian', hint: 'Extra calories are eaten back half as halloumi, half as rice.' },
+      { value: 'vegan', label: 'Vegan', hint: 'Extra calories are eaten back half as tofu, half as rice.' },
+    ],
+  },
+  num({ key: 'chickenPricePerKg', urlKey: 'cp', group: 'you', label: 'Chicken breast price', unit: '€/kg', min: 0, max: 100, step: 0.1, integer: false, visibleWhen: (inputs) => inputs.diet === 'meat' }),
+  num({ key: 'halloumiPricePerKg', urlKey: 'hp', group: 'you', label: 'Halloumi price', unit: '€/kg', min: 0, max: 100, step: 0.1, integer: false, visibleWhen: (inputs) => inputs.diet === 'vegetarian' }),
+  num({ key: 'tofuPricePerKg', urlKey: 'tp', group: 'you', label: 'Tofu price', unit: '€/kg', min: 0, max: 100, step: 0.1, integer: false, visibleWhen: (inputs) => inputs.diet === 'vegan' }),
+  num({ key: 'ricePricePerKg', urlKey: 'rp', group: 'you', label: 'Rice price', unit: '€/kg', min: 0, max: 50, step: 0.1, integer: false }),
   num({ key: 'cyclistFatalityPerBillionKm', urlKey: 'cf', group: 'advanced', label: 'Cyclist fatality rate', unit: 'deaths per billion km', min: 0, max: 200, step: 1, integer: false, hint: 'About 8 in the Netherlands and 21 in the UK (ITF/IRTAD, 2011–2015).' }),
   {
     kind: 'optionalNumber',

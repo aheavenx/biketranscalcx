@@ -14,4 +14,9 @@ describe('Methodology', () => {
     render(<Methodology />);
     expect(screen.queryByText(/VO₂max/)).not.toBeInTheDocument();
   });
+
+  it("names every diet's protein food", () => {
+    const { container } = render(<Methodology />);
+    expect(container).toHaveTextContent('chicken breast, halloumi or tofu');
+  });
 });

@@ -63,4 +63,12 @@ describe('App', () => {
     expect(headline()).toHaveTextContent(/over 10 years/);
     expect(screen.getByRole('slider')).toHaveValue('10');
   });
+
+  it('prices extra food by the chosen diet', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.selectOptions(screen.getByLabelText(/^diet/i), 'vegan');
+    expect(headline()).toHaveTextContent('Cycling saves €3,401 over 5 years');
+    expect(screen.getByLabelText(/tofu price/i)).toHaveValue('6');
+  });
 });

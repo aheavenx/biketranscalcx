@@ -20,7 +20,7 @@ export function Methodology() {
             <strong>Extra food</strong> comes from a physics model of riding power on a flat road with no wind
             (rolling resistance of commuter tyres, air drag scaled by body size, ×1.1 for city stop-and-go), or your
             own average power if you enter one. Power is divided by a fitness-dependent muscle efficiency, minus
-            resting burn (Mifflin-St Jeor). Half the extra calories are eaten back as chicken breast and half as rice.
+            resting burn (Mifflin-St Jeor). Half the extra calories are eaten back as chicken breast, halloumi or tofu, depending on your diet, and half as rice.
           </li>
           <li>
             <strong>Life expectancy</strong> follows WHO HEAT: 10% lower risk of death per 100 minutes of cycling a

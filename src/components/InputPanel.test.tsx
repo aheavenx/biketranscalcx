@@ -141,4 +141,23 @@ describe('InputPanel geeky stats', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Enter a number from 10 to 1000');
     expect(setInput).not.toHaveBeenCalled();
   });
+
+  it('explains the selected diet', () => {
+    setup();
+    expect(screen.getByLabelText(/^diet/i)).toHaveAccessibleDescription('Extra calories are eaten back half as chicken breast, half as rice.');
+  });
+
+  it("shows only the selected diet's protein price", () => {
+    setup({ diet: 'vegan' });
+    expect(screen.getByLabelText(/tofu price/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/chicken breast price/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/halloumi price/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^rice price/i)).toBeInTheDocument();
+  });
+
+  it('reports diet changes', async () => {
+    const { user, setInput } = setup();
+    await user.selectOptions(screen.getByLabelText(/^diet/i), 'vegetarian');
+    expect(setInput).toHaveBeenCalledWith('diet', 'vegetarian');
+  });
 });

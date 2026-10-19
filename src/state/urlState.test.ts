@@ -74,3 +74,17 @@ describe('sanitizeInputs', () => {
     expect(sanitizeInputs({ avgPowerW: 'fast' }).avgPowerW).toBeNull();
   });
 });
+
+describe('diet', () => {
+  it('keeps hidden protein prices in the URL and round-trips the diet', () => {
+    const inputs = { ...DEFAULT_INPUTS, diet: 'vegan' as const, chickenPricePerKg: 12, tofuPricePerKg: 7.5 };
+    expect(inputsToSearch(inputs)).toBe('dt=vegan&cp=12&tp=7.5');
+    expect(inputsFromSearch(`?${inputsToSearch(inputs)}`)).toEqual(inputs);
+  });
+
+  it('loads old links and stored inputs without a diet as meat', () => {
+    expect(inputsFromSearch('?cp=12')).toEqual({ ...DEFAULT_INPUTS, chickenPricePerKg: 12 });
+    expect(inputsFromSearch('?dt=pescatarian').diet).toBe('meat');
+    expect(sanitizeInputs({ chickenPricePerKg: 11 }).diet).toBe('meat');
+  });
+});

@@ -1,19 +1,35 @@
 import { bikesBought, capitalCostForYear } from './bike';
 import { computedPowerW, netKcalPerTrip } from './calories';
 import { kmPerYear, rideMinutesPerTrip, tripsPerYear } from './commute';
-import type { CostResults, CumulativeTotals, Inputs, TicketStrategy, YearRow } from './types';
+import type { CostResults, CumulativeTotals, Diet, Inputs, TicketStrategy, YearRow } from './types';
 
-/** Raw skinless chicken breast and dry white rice (USDA FoodData Central). */
+/** Raw skinless chicken breast (USDA FoodData Central). */
 export const CHICKEN_KCAL_PER_KG = 1200;
+/** Halloumi (typical retail label, about 320 kcal per 100 g). */
+export const HALLOUMI_KCAL_PER_KG = 3200;
+/** Firm tofu (USDA FoodData Central). */
+export const TOFU_KCAL_PER_KG = 1440;
+/** Dry white rice (USDA FoodData Central). */
 export const RICE_KCAL_PER_KG = 3600;
-/** Share of the extra calories eaten as chicken (protein); the rest is eaten as rice (carbs). */
-export const CHICKEN_KCAL_SHARE = 0.5;
+/** Share of the extra calories eaten as protein food; the rest is eaten as rice (carbs). */
+export const PROTEIN_KCAL_SHARE = 0.5;
 
-/** Cost of eating back one kcal burned, bought as chicken breast and rice. */
+const PROTEIN_KCAL_PER_KG: Record<Diet, number> = {
+  meat: CHICKEN_KCAL_PER_KG,
+  vegetarian: HALLOUMI_KCAL_PER_KG,
+  vegan: TOFU_KCAL_PER_KG,
+};
+
+/** Cost of eating back one kcal burned, bought as the diet's protein food (chicken breast, halloumi or tofu) and rice. */
 export function foodCostPerKcal(inputs: Inputs): number {
+  const proteinPricePerKg = {
+    meat: inputs.chickenPricePerKg,
+    vegetarian: inputs.halloumiPricePerKg,
+    vegan: inputs.tofuPricePerKg,
+  }[inputs.diet];
   return (
-    (CHICKEN_KCAL_SHARE * inputs.chickenPricePerKg) / CHICKEN_KCAL_PER_KG +
-    ((1 - CHICKEN_KCAL_SHARE) * inputs.ricePricePerKg) / RICE_KCAL_PER_KG
+    (PROTEIN_KCAL_SHARE * proteinPricePerKg) / PROTEIN_KCAL_PER_KG[inputs.diet] +
+    ((1 - PROTEIN_KCAL_SHARE) * inputs.ricePricePerKg) / RICE_KCAL_PER_KG
   );
 }
 

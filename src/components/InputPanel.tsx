@@ -68,7 +68,7 @@ export function InputPanel({ inputs, setInput, onReset, shareUrl, computedPowerW
     );
   };
 
-  const fieldsIn = (group: FieldGroup) => FIELD_SPECS.filter((spec) => spec.group === group).map(renderField);
+  const fieldsIn = (group: FieldGroup) => FIELD_SPECS.filter((spec) => spec.group === group && spec.visibleWhen?.(inputs) !== false).map(renderField);
 
   async function copyShareLink() {
     try {

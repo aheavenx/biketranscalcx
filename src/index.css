@@ -432,13 +432,8 @@ summary:focus-visible {
   margin: 0;
 }
 
-.methodology ul,
-.sources {
+.methodology ul {
   color: var(--text-secondary);
   font-size: 0.875rem;
   padding-left: 20px;
-}
-
-.methodology details + details {
-  margin-top: 12px;
 }

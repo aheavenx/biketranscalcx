@@ -1,12 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Methodology, SOURCES } from './Methodology';
+import { Methodology } from './Methodology';
 
 describe('Methodology', () => {
-  it('lists every source', () => {
-    render(<Methodology />);
-    expect(SOURCES).toHaveLength(13);
-    for (const source of SOURCES) expect(screen.getByText(source)).toBeInTheDocument();
+  it('is titled Methodology and has no sources', () => {
+    const { container } = render(<Methodology />);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(/^Methodology$/);
+    expect(screen.queryByText('Sources')).not.toBeInTheDocument();
+    expect(container.querySelector('.sources')).toBeNull();
   });
 
   it('does not describe VO₂max', () => {

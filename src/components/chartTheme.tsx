@@ -19,3 +19,11 @@ export const TOOLTIP_PROPS = {
 export function renderLegendLabel(value: string) {
   return <span className="legend-label">{value}</span>;
 }
+
+/** The four cost series shared by the cumulative and speed charts: bike and transit, true cost and money only. */
+export const COST_LINES = [
+  { key: 'bikeTrue', name: 'Bike, true cost', color: 'var(--series-bike)', dashed: false },
+  { key: 'transitTrue', name: 'Public transport, true cost', color: 'var(--series-transit)', dashed: false },
+  { key: 'bikeMoney', name: 'Bike, money only', color: 'var(--series-bike)', dashed: true },
+  { key: 'transitMoney', name: 'Public transport, money only', color: 'var(--series-transit)', dashed: true },
+] as const;

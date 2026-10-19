@@ -76,4 +76,14 @@ describe('App', () => {
     expect(headline()).toHaveTextContent('Cycling saves €3,401 over 5 years');
     expect(screen.getByLabelText(/tofu price/i)).toHaveValue('6');
   });
+
+  it('keeps typed protein prices when switching diet', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.clear(screen.getByLabelText(/chicken breast price/i));
+    await user.type(screen.getByLabelText(/chicken breast price/i), '14');
+    await user.selectOptions(screen.getByLabelText(/^diet/i), 'vegan');
+    await user.selectOptions(screen.getByLabelText(/^diet/i), 'meat');
+    expect(screen.getByLabelText(/chicken breast price/i)).toHaveValue('14');
+  });
 });

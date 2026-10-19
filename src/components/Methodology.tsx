@@ -28,7 +28,7 @@ export function Methodology() {
             at your fatality rate.
           </li>
           <li>
-            <strong>Riding speed</strong> charts re-run the cost and calorie model at each speed from 10 to 40 km/h using
+            <strong>Riding speed</strong> charts re-run the cost and calorie model at each speed from 10 to 40 km/h (and at your own speed) using
             computed power, holding every other input fixed. Weight loss assumes 7,700 kcal per kg of body fat and that
             the extra calories are not eaten back.
           </li>

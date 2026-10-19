@@ -1,7 +1,7 @@
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatEuro, formatEuroCompact, pluralYears } from '../format';
 import type { CumulativeTotals, YearRow } from '../model/types';
-import { AXIS_PROPS, renderLegendLabel, TOOLTIP_PROPS } from './chartTheme';
+import { AXIS_PROPS, COST_LINES, renderLegendLabel, TOOLTIP_PROPS } from './chartTheme';
 
 export function cumulativeSeries(rows: YearRow[]): (CumulativeTotals & { year: number })[] {
   return [
@@ -9,13 +9,6 @@ export function cumulativeSeries(rows: YearRow[]): (CumulativeTotals & { year: n
     ...rows.map((row) => ({ year: row.year, ...row.cumulative })),
   ];
 }
-
-const LINES = [
-  { key: 'bikeTrue', name: 'Bike, true cost', color: 'var(--series-bike)', dashed: false },
-  { key: 'transitTrue', name: 'Public transport, true cost', color: 'var(--series-transit)', dashed: false },
-  { key: 'bikeMoney', name: 'Bike, money only', color: 'var(--series-bike)', dashed: true },
-  { key: 'transitMoney', name: 'Public transport, money only', color: 'var(--series-transit)', dashed: true },
-] as const;
 
 export function CumulativeChart({ rows }: { rows: YearRow[] }) {
   const last = rows[rows.length - 1];
@@ -35,7 +28,7 @@ export function CumulativeChart({ rows }: { rows: YearRow[] }) {
               {...TOOLTIP_PROPS}
             />
             <Legend formatter={renderLegendLabel} />
-            {LINES.map((line) => (
+            {COST_LINES.map((line) => (
               <Line
                 key={line.key}
                 type="monotone"

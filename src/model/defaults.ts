@@ -59,7 +59,9 @@ export const DEFAULT_INPUTS: Inputs = {
   valueOfTimePerHour: 15,
   diet: 'meat',
   chickenPricePerKg: 10,
+  // ≈€11–12/kg: Lidl/Aldi 225 g packs at €2.49–2.69 (DE/NL, 2025).
   halloumiPricePerKg: 12,
+  // ≈€4.50–8/kg in German supermarkets (Aldi Süd €4.63, Edeka €5.73, Alnatura €7.95).
   tofuPricePerKg: 6,
   ricePricePerKg: 2,
   cyclistFatalityPerBillionKm: 15,

@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { computeAll } from '../model/compute';
 import { DEFAULT_INPUTS } from '../model/defaults';
+import type { SpeedPoint } from '../model/types';
 import { RESULTS_FIXTURE } from '../test/fixtures';
-import { SpeedCharts } from './SpeedCharts';
+import { SpeedCharts, speedTicks } from './SpeedCharts';
 
 const inputs = { ...DEFAULT_INPUTS, horizonYears: 2 };
 const points = RESULTS_FIXTURE.speed;
@@ -34,5 +36,26 @@ describe('SpeedCharts', () => {
     expect(screen.queryByText(/not the average power you entered/)).not.toBeInTheDocument();
     rerender(<SpeedCharts points={points} inputs={{ ...inputs, avgPowerW: 150 }} />);
     expect(screen.getByText(/not the average power you entered/)).toBeInTheDocument();
+  });
+  it('summarises a fractional rider speed from the real model', () => {
+    const real = { ...DEFAULT_INPUTS, bikeSpeedKmh: 17.5 };
+    render(<SpeedCharts points={computeAll(real).speed} inputs={real} />);
+    expect(screen.getAllByText(/at your 17\.5 km\/h/)).toHaveLength(2);
+  });
+});
+
+describe('speedTicks', () => {
+  const sweep = (from: number, to: number) => [{ speedKmh: from }, { speedKmh: 17.5 }, { speedKmh: to }] as SpeedPoint[];
+  it('uses multiples of 5 for the default 10-40 sweep', () => {
+    expect(speedTicks(sweep(10, 40))).toEqual([10, 15, 20, 25, 30, 35, 40]);
+  });
+  it('adds the lower endpoint when the sweep starts below 10', () => {
+    expect(speedTicks(sweep(5, 40))).toEqual([5, 10, 15, 20, 25, 30, 35, 40]);
+  });
+  it('adds the upper endpoint when the sweep ends above 40', () => {
+    expect(speedTicks(sweep(10, 45))).toEqual([10, 15, 20, 25, 30, 35, 40, 45]);
+  });
+  it('keeps off-multiple endpoints', () => {
+    expect(speedTicks(sweep(12.5, 37))).toEqual([12.5, 15, 20, 25, 30, 35, 37]);
   });
 });

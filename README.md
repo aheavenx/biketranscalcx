@@ -29,6 +29,6 @@ Or from the command line: `npx vercel` for a preview deployment, then `npx verce
 
 ## How it works
 
-All calculations live in `src/model/` as pure functions with unit tests. The formulas, assumptions and sources are
+All calculations live in `src/model/` as pure functions with unit tests. The formulas and assumptions are
 described in the app's "Methodology" section and in
 `docs/superpowers/specs/2026-10-17-bikecalcx-design.md`.

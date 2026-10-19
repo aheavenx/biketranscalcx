@@ -41,4 +41,9 @@ export const RESULTS_FIXTURE: Results = {
     outsideHeatAgeRange: false,
   },
   wellbeing: { weeklyActiveMinutes: 236, whoGuidelinePct: 157.3, netKcalPerYear: 70700, fatEquivalentKg: 9.18 },
+  speed: [
+    { speedKmh: 10, bikeTrue: 28000, bikeMoney: 2500, transitTrue: 23725, transitMoney: 3600, fatKgPerYear: 4.2 },
+    { speedKmh: 18, bikeTrue: 20955, bikeMoney: 2747, transitTrue: 23725, transitMoney: 3600, fatKgPerYear: 7.9 },
+    { speedKmh: 40, bikeTrue: 16000, bikeMoney: 6000, transitTrue: 23725, transitMoney: 3600, fatKgPerYear: 30.1 },
+  ],
 };

@@ -88,8 +88,20 @@ export interface WellbeingResults {
   fatEquivalentKg: number;
 }
 
+export interface SpeedPoint {
+  speedKmh: number;
+  /** Horizon totals at this speed, like CostResults.totals. */
+  bikeTrue: number;
+  bikeMoney: number;
+  transitTrue: number;
+  transitMoney: number;
+  /** Body fat burned per year if the extra calories are not eaten back. */
+  fatKgPerYear: number;
+}
+
 export interface Results {
   costs: CostResults;
   lifeExpectancy: LifeExpectancyResults;
   wellbeing: WellbeingResults;
+  speed: SpeedPoint[];
 }

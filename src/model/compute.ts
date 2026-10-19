@@ -1,5 +1,6 @@
 import { computeCosts } from './costs';
 import { computeLifeExpectancy } from './mortality';
+import { computeSpeedSweep } from './speed';
 import type { Inputs, Results } from './types';
 import { computeWellbeing } from './wellbeing';
 
@@ -8,5 +9,6 @@ export function computeAll(inputs: Inputs): Results {
     costs: computeCosts(inputs),
     lifeExpectancy: computeLifeExpectancy(inputs),
     wellbeing: computeWellbeing(inputs),
+    speed: computeSpeedSweep(inputs),
   };
 }

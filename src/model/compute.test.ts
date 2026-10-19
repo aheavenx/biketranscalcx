@@ -7,6 +7,7 @@ describe('computeAll', () => {
     const results = computeAll({ ...DEFAULT_INPUTS, horizonYears: 7 });
     expect(results.costs.rows).toHaveLength(7);
     expect(results).not.toHaveProperty('fitness');
+    expect(results.speed).toHaveLength(31);
     expect(results.lifeExpectancy.baselineRemainingYears).toBeGreaterThan(0);
     expect(results.wellbeing.netKcalPerYear).toBeCloseTo(
       results.costs.tripsPerYear * results.costs.netKcalPerTrip,

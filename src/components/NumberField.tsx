@@ -11,14 +11,18 @@ export function parseNumber(text: string): number {
   return trimmed === '' ? Number.NaN : Number(trimmed);
 }
 
+/** The step-grid value at `index` steps from zero, rounded to the step's decimals. */
+function gridValue(spec: NumericFieldSpec, index: number): number {
+  const decimals = (String(spec.step).split('.')[1] ?? '').length;
+  return Number((index * spec.step).toFixed(decimals));
+}
+
 /** The next value on the step grid (multiples of `spec.step`) strictly above or below `current`, clamped to the spec's range. */
 export function stepValue(spec: NumericFieldSpec, current: number, direction: 1 | -1): number {
   const quotient = current / spec.step;
   const onGrid = Math.abs(quotient - Math.round(quotient)) < 1e-9;
   const index = onGrid ? Math.round(quotient) + direction : direction > 0 ? Math.ceil(quotient) : Math.floor(quotient);
-  const decimals = (String(spec.step).split('.')[1] ?? '').length;
-  const next = Number((index * spec.step).toFixed(decimals));
-  return Math.min(spec.max, Math.max(spec.min, next));
+  return Math.min(spec.max, Math.max(spec.min, gridValue(spec, index)));
 }
 
 function Chevron({ down }: { down?: boolean }) {
@@ -31,7 +35,7 @@ function Chevron({ down }: { down?: boolean }) {
 
 interface NumberFieldProps {
   spec: NumericFieldSpec;
-  /** Seeds the draft text only; the parent remounts the field (via `key`) to reset it. Null seeds a blank field. */
+  /** Seeds the draft text and is the step base while the draft is invalid; the parent remounts the field (via `key`) to reset it. Null seeds a blank field. */
   value: number | null;
   onChange: (value: number) => void;
   /** Optional fields only: called when the text is cleared, so the model falls back to `fallback`. */
@@ -56,9 +60,12 @@ export function NumberField({ spec, value, onChange, onClear, fallback }: Number
   const base = !Number.isNaN(parsedDraft)
     ? parsedDraft
     : isBlankAllowed(draft)
-      ? (fallback ?? value ?? spec.min)
+      ? fallback !== undefined
+        ? gridValue(spec, Math.round(fallback / spec.step))
+        : (value ?? spec.min)
       : (value ?? fallback ?? spec.min);
   const step = (direction: 1 | -1) => {
+    if (direction > 0 ? base >= spec.max : base <= spec.min) return;
     const next = stepValue(spec, base, direction);
     setDraft(String(next));
     onChange(next);
@@ -80,6 +87,7 @@ export function NumberField({ spec, value, onChange, onClear, fallback }: Number
           aria-describedby={describedBy || undefined}
           onKeyDown={(event) => {
             if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+            if (event.ctrlKey || event.altKey || event.metaKey) return;
             event.preventDefault();
             step(event.key === 'ArrowUp' ? 1 : -1);
           }}
@@ -94,7 +102,7 @@ export function NumberField({ spec, value, onChange, onClear, fallback }: Number
             if (isValidNumber(spec, parsed)) onChange(parsed);
           }}
         />
-        <div className="stepper">
+        <div className="stepper" onMouseDown={(event) => event.preventDefault()}>
           <button type="button" tabIndex={-1} disabled={base >= spec.max} onClick={() => step(1)}>
             <Chevron />
             <span className="visually-hidden">Increase {spec.label}</span>

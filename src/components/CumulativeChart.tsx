@@ -34,6 +34,7 @@ export function CumulativeChart({ rows }: { rows: YearRow[] }) {
                 type="monotone"
                 dataKey={line.key}
                 name={line.name}
+                legendType="plainline"
                 stroke={line.color}
                 strokeWidth={2}
                 strokeDasharray={line.dashed ? '6 4' : undefined}

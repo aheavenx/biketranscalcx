@@ -207,4 +207,36 @@ describe('InputPanel steppers', () => {
     expect(setInput).toHaveBeenLastCalledWith('distanceKm', 8.5);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+
+  it('steps a blank own power down from the rounded computed value', async () => {
+    const { user, setInput } = setup();
+    await user.click(screen.getByRole('button', { name: 'Decrease Average power per trip' }));
+    expect(setInput).toHaveBeenLastCalledWith('avgPowerW', 83);
+  });
+
+  it('keeps focus in the field after clicking an arrow', async () => {
+    const { user, setInput } = setup();
+    const field = screen.getByLabelText(/one-way distance/i);
+    await user.click(field);
+    await user.click(screen.getByRole('button', { name: 'Increase One-way distance' }));
+    expect(field).toHaveFocus();
+    await user.keyboard('{ArrowUp}');
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 9);
+  });
+
+  it('does not let the arrow keys move an out-of-range value the wrong way', async () => {
+    const { user, setInput } = setup();
+    const field = screen.getByLabelText(/one-way distance/i);
+    await user.clear(field);
+    await user.type(field, '999');
+    setInput.mockClear();
+    await user.keyboard('{ArrowUp}');
+    expect(setInput).not.toHaveBeenCalled();
+    expect(field).toHaveValue('999');
+  });
+
+  it('disables Decrease at the minimum', () => {
+    setup({ tripsPerWeek: 0 });
+    expect(screen.getByRole('button', { name: 'Decrease One-way trips per week' })).toBeDisabled();
+  });
 });

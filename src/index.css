@@ -258,6 +258,17 @@ p {
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  .number-input input[type='text'] {
+    padding-right: 42px;
+  }
+
+  .stepper {
+    width: 32px;
+  }
 }
 
 .stepper button:hover:not(:disabled) {

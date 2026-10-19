@@ -161,3 +161,50 @@ describe('InputPanel geeky stats', () => {
     expect(setInput).toHaveBeenCalledWith('diet', 'vegetarian');
   });
 });
+
+describe('InputPanel steppers', () => {
+  it('gives every numeric field increase and decrease arrows', () => {
+    setup();
+    const fields = screen.getAllByRole('textbox').length;
+    expect(screen.getAllByRole('button', { name: /^Increase / })).toHaveLength(fields);
+    expect(screen.getAllByRole('button', { name: /^Decrease / })).toHaveLength(fields);
+  });
+
+  it('steps a field up and down', async () => {
+    const { user, setInput } = setup();
+    await user.click(screen.getByRole('button', { name: 'Increase One-way distance' }));
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 8.5);
+    expect(screen.getByLabelText(/one-way distance/i)).toHaveValue('8.5');
+    await user.click(screen.getByRole('button', { name: 'Decrease One-way distance' }));
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 8);
+  });
+
+  it('steps with the arrow keys', async () => {
+    const { user, setInput } = setup();
+    await user.click(screen.getByLabelText(/one-way distance/i));
+    await user.keyboard('{ArrowUp}');
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 8.5);
+  });
+
+  it('disables the arrow at a bound', () => {
+    setup({ tripsPerWeek: 28 });
+    expect(screen.getByRole('button', { name: 'Increase One-way trips per week' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Decrease One-way trips per week' })).toBeEnabled();
+  });
+
+  it('steps a blank own power from the computed value', async () => {
+    const { user, setInput } = setup();
+    await user.click(screen.getByRole('button', { name: 'Increase Average power per trip' }));
+    expect(setInput).toHaveBeenLastCalledWith('avgPowerW', 85);
+  });
+
+  it('steps from the last valid value when the text is invalid', async () => {
+    const { user, setInput } = setup();
+    const field = screen.getByLabelText(/one-way distance/i);
+    await user.clear(field);
+    await user.type(field, 'abc');
+    await user.click(screen.getByRole('button', { name: 'Increase One-way distance' }));
+    expect(setInput).toHaveBeenLastCalledWith('distanceKm', 8.5);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});

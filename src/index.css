@@ -228,6 +228,59 @@ p {
   width: 100%;
 }
 
+.number-input {
+  position: relative;
+}
+
+.number-input input[type='text'] {
+  padding-right: 32px;
+}
+
+.stepper {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 22px;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  border-left: 1px solid var(--grid);
+  border-radius: 0 7px 7px 0;
+  overflow: hidden;
+}
+
+.stepper button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.stepper button:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.stepper button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .field input[aria-invalid='true'] {
   border-color: var(--error);
 }

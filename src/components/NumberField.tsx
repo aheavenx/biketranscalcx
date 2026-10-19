@@ -11,6 +11,24 @@ export function parseNumber(text: string): number {
   return trimmed === '' ? Number.NaN : Number(trimmed);
 }
 
+/** The next value on the step grid (multiples of `spec.step`) strictly above or below `current`, clamped to the spec's range. */
+export function stepValue(spec: NumericFieldSpec, current: number, direction: 1 | -1): number {
+  const quotient = current / spec.step;
+  const onGrid = Math.abs(quotient - Math.round(quotient)) < 1e-9;
+  const index = onGrid ? Math.round(quotient) + direction : direction > 0 ? Math.ceil(quotient) : Math.floor(quotient);
+  const decimals = (String(spec.step).split('.')[1] ?? '').length;
+  const next = Number((index * spec.step).toFixed(decimals));
+  return Math.min(spec.max, Math.max(spec.min, next));
+}
+
+function Chevron({ down }: { down?: boolean }) {
+  return (
+    <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d={down ? 'M1 1l4 4 4-4' : 'M1 5l4-4 4 4'} />
+    </svg>
+  );
+}
+
 interface NumberFieldProps {
   spec: NumericFieldSpec;
   /** Seeds the draft text only; the parent remounts the field (via `key`) to reset it. Null seeds a blank field. */
@@ -34,30 +52,59 @@ export function NumberField({ spec, value, onChange, onClear, fallback }: Number
   const errorId = `${id}-error`;
   const describedBy = [hint ? hintId : '', valid ? '' : errorId].filter(Boolean).join(' ');
 
+  const parsedDraft = parseNumber(draft);
+  const base = !Number.isNaN(parsedDraft)
+    ? parsedDraft
+    : isBlankAllowed(draft)
+      ? (fallback ?? value ?? spec.min)
+      : (value ?? fallback ?? spec.min);
+  const step = (direction: 1 | -1) => {
+    const next = stepValue(spec, base, direction);
+    setDraft(String(next));
+    onChange(next);
+  };
+
   return (
     <div className="field">
       <label htmlFor={id}>
         {spec.label} <span className="unit">({spec.unit})</span>
       </label>
-      <input
-        id={id}
-        type="text"
-        inputMode="decimal"
-        value={draft}
-        placeholder={fallback === undefined ? undefined : formatNumber(fallback)}
-        aria-invalid={!valid}
-        aria-describedby={describedBy || undefined}
-        onChange={(event) => {
-          const text = event.target.value;
-          setDraft(text);
-          if (isBlankAllowed(text)) {
-            onClear?.();
-            return;
-          }
-          const parsed = parseNumber(text);
-          if (isValidNumber(spec, parsed)) onChange(parsed);
-        }}
-      />
+      <div className="number-input">
+        <input
+          id={id}
+          type="text"
+          inputMode="decimal"
+          value={draft}
+          placeholder={fallback === undefined ? undefined : formatNumber(fallback)}
+          aria-invalid={!valid}
+          aria-describedby={describedBy || undefined}
+          onKeyDown={(event) => {
+            if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+            event.preventDefault();
+            step(event.key === 'ArrowUp' ? 1 : -1);
+          }}
+          onChange={(event) => {
+            const text = event.target.value;
+            setDraft(text);
+            if (isBlankAllowed(text)) {
+              onClear?.();
+              return;
+            }
+            const parsed = parseNumber(text);
+            if (isValidNumber(spec, parsed)) onChange(parsed);
+          }}
+        />
+        <div className="stepper">
+          <button type="button" tabIndex={-1} disabled={base >= spec.max} onClick={() => step(1)}>
+            <Chevron />
+            <span className="visually-hidden">Increase {spec.label}</span>
+          </button>
+          <button type="button" tabIndex={-1} disabled={base <= spec.min} onClick={() => step(-1)}>
+            <Chevron down />
+            <span className="visually-hidden">Decrease {spec.label}</span>
+          </button>
+        </div>
+      </div>
       {hint && (
         <p id={hintId} className="hint">
           {hint}

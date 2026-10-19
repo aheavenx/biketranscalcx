@@ -40,15 +40,5 @@ export const RESULTS_FIXTURE: Results = {
     riskReduction: 0.2359,
     outsideHeatAgeRange: false,
   },
-  fitness: {
-    baselineVo2max: 35.8,
-    points: [
-      { year: 0, transit: 35.8, bike: 35.8 },
-      { year: 1, transit: 35.44, bike: 37.59 },
-      { year: 2, transit: 35.09, bike: 37.4 },
-    ],
-    currentFitnessAge: 36,
-    fitnessAgeAtEnd: { transit: 38, bike: 32 },
-  },
   wellbeing: { weeklyActiveMinutes: 236, whoGuidelinePct: 157.3, netKcalPerYear: 70700, fatEquivalentKg: 9.18 },
 };

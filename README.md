@@ -1,7 +1,7 @@
 # BikeCalcX
 
 Estimate the true cost of commuting by bike versus public transport over 1–30 years: money spent, time valued at
-your hourly rate, plus a separate evidence-based health projection (life expectancy net of crash risk, VO₂max fitness
+your hourly rate, plus a separate evidence-based health projection (life expectancy net of crash risk
 and well-being). Inputs are saved in the URL, so any scenario can be shared as a link.
 
 ## Develop

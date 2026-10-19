@@ -1,5 +1,4 @@
 import type { Inputs, Results } from '../../model/types';
-import { FitnessChart } from './FitnessChart';
 import { LifeExpectancy } from './LifeExpectancy';
 import { Wellbeing } from './Wellbeing';
 
@@ -17,7 +16,6 @@ export function HealthPanel({ results, inputs }: HealthPanelProps) {
       </p>
       <div className="health-grid">
         <LifeExpectancy lifeExpectancy={results.lifeExpectancy} age={inputs.age} horizonYears={inputs.horizonYears} />
-        <FitnessChart fitness={results.fitness} />
         <Wellbeing wellbeing={results.wellbeing} />
       </div>
     </section>

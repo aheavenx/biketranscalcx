@@ -97,7 +97,7 @@ export const FIELD_SPECS: FieldSpec[] = [
     urlKey: 'ft',
     group: 'you',
     label: 'Fitness level',
-    // Hints describe the Jackson et al. (1990) activity rating each level maps to (see fitness.ts).
+    // Hints describe each level's weekly exercise; the level sets cycling efficiency (GROSS_EFFICIENCY in calories.ts).
     options: [
       { value: 'sedentary', label: 'Sedentary', hint: 'Little exercise beyond occasional walks.' },
       { value: 'light', label: 'Lightly active', hint: 'Up to 1 hour a week of moderate exercise.' },

@@ -8,4 +8,9 @@ describe('Methodology', () => {
     expect(SOURCES).toHaveLength(13);
     for (const source of SOURCES) expect(screen.getByText(source)).toBeInTheDocument();
   });
+
+  it('does not describe VO₂max', () => {
+    render(<Methodology />);
+    expect(screen.queryByText(/VO₂max/)).not.toBeInTheDocument();
+  });
 });

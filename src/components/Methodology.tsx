@@ -43,11 +43,6 @@ export function Methodology() {
             week, capped at 45%, for ages 20–64, applied to an EU mortality curve while you commute, minus crash risk
             at your fatality rate.
           </li>
-          <li>
-            <strong>Fitness</strong> is VO₂max estimated without an exercise test (Jackson et al. 1990). Commuting
-            adds a first-year gain scaled to your weekly minutes, then fitness declines more slowly than when
-            inactive.
-          </li>
         </ul>
       </details>
       <details>

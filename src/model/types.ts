@@ -77,20 +77,6 @@ export interface LifeExpectancyResults {
   outsideHeatAgeRange: boolean;
 }
 
-export interface FitnessPoint {
-  year: number;
-  transit: number;
-  bike: number;
-}
-
-export interface FitnessResults {
-  baselineVo2max: number;
-  /** Year 0 to horizonYears inclusive, VO2max in ml/kg/min. */
-  points: FitnessPoint[];
-  currentFitnessAge: number;
-  fitnessAgeAtEnd: { transit: number; bike: number };
-}
-
 export interface WellbeingResults {
   weeklyActiveMinutes: number;
   whoGuidelinePct: number;
@@ -101,6 +87,5 @@ export interface WellbeingResults {
 export interface Results {
   costs: CostResults;
   lifeExpectancy: LifeExpectancyResults;
-  fitness: FitnessResults;
   wellbeing: WellbeingResults;
 }

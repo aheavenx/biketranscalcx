@@ -10,6 +10,11 @@ describe('Methodology', () => {
     expect(container.querySelector('.sources')).toBeNull();
   });
 
+  it('describes the riding-speed charts', () => {
+    const { container } = render(<Methodology />);
+    expect(container).toHaveTextContent('re-run the cost and calorie model at each speed from 10 to 40 km/h');
+  });
+
   it('does not describe VO₂max', () => {
     render(<Methodology />);
     expect(screen.queryByText(/VO₂max/)).not.toBeInTheDocument();

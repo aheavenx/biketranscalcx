@@ -6,6 +6,11 @@ import App from './App';
 const headline = () => screen.getByRole('heading', { name: /saves/ });
 
 describe('App', () => {
+  it('shows the riding-speed panel', () => {
+    render(<App />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Riding speed' })).toBeInTheDocument();
+  });
+
   it('shows the default headline', () => {
     render(<App />);
     expect(headline()).toHaveTextContent('Cycling saves €2,770 over 5 years');

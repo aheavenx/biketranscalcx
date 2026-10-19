@@ -27,6 +27,11 @@ export function Methodology() {
             week, capped at 45%, for ages 20–64, applied to an EU mortality curve while you commute, minus crash risk
             at your fatality rate.
           </li>
+          <li>
+            <strong>Riding speed</strong> charts re-run the cost and calorie model at each speed from 10 to 40 km/h using
+            computed power, holding every other input fixed. Weight loss assumes 7,700 kcal per kg of body fat and that
+            the extra calories are not eaten back.
+          </li>
         </ul>
       </details>
     </section>

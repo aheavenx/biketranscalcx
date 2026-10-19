@@ -20,7 +20,7 @@ export const EVIDENCE = [
 export function Wellbeing({ wellbeing }: { wellbeing: WellbeingResults }) {
   const fill = Math.min(wellbeing.weeklyActiveMinutes / WHO_MAX_WEEKLY_MINUTES, 1) * 100;
   return (
-    <div className="health-card">
+    <div className="card">
       <h3>Well-being</h3>
       <p>
         <strong>{formatNumber(wellbeing.weeklyActiveMinutes)} minutes a week</strong> of cycling,{' '}

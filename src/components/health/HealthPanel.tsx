@@ -14,7 +14,7 @@ export function HealthPanel({ results, inputs }: HealthPanelProps) {
       <p className="subhead">
         Kept separate from the cost figures. Population averages from published studies, not medical advice.
       </p>
-      <div className="health-grid">
+      <div className="card-grid">
         <LifeExpectancy lifeExpectancy={results.lifeExpectancy} age={inputs.age} horizonYears={inputs.horizonYears} />
         <Wellbeing wellbeing={results.wellbeing} />
       </div>

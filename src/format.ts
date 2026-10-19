@@ -47,3 +47,8 @@ export function formatPayback(months: number | null): string {
 export function pluralYears(years: number): string {
   return `${years} ${years === 1 ? 'year' : 'years'}`;
 }
+
+/** Riding speed with a decimal only when needed, e.g. "18 km/h" or "17.5 km/h". */
+export function formatSpeed(kmh: number): string {
+  return `${Number.isInteger(kmh) ? kmh : formatNumber(kmh, 1)} km/h`;
+}

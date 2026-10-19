@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatEuro, formatEuroCompact, formatLifeDelta, formatNumber, formatPayback, pluralYears } from './format';
+import { formatEuro, formatEuroCompact, formatLifeDelta, formatNumber, formatPayback, formatSpeed, pluralYears } from './format';
 
 describe('formatEuro', () => {
   it('formats whole euros with grouping', () => {
@@ -56,5 +56,12 @@ describe('pluralYears', () => {
   it('pluralises', () => {
     expect(pluralYears(1)).toBe('1 year');
     expect(pluralYears(5)).toBe('5 years');
+  });
+});
+
+describe('formatSpeed', () => {
+  it('formats speeds with a decimal only when needed', () => {
+    expect(formatSpeed(18)).toBe('18 km/h');
+    expect(formatSpeed(17.5)).toBe('17.5 km/h');
   });
 });

@@ -9,7 +9,7 @@ interface LifeExpectancyProps {
 
 export function LifeExpectancy({ lifeExpectancy: le, age, horizonYears }: LifeExpectancyProps) {
   return (
-    <div className="health-card">
+    <div className="card">
       <h3>Life expectancy</h3>
       <p className="big-figure">{formatLifeDelta(le.netGainYears)}</p>
       <p>

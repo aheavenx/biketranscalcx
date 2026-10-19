@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { BreakdownChart } from './components/BreakdownChart';
 import { CumulativeChart } from './components/CumulativeChart';
+import { SpeedCharts } from './components/SpeedCharts';
 import { HealthPanel } from './components/health/HealthPanel';
 import { InputPanel } from './components/InputPanel';
 import { Methodology } from './components/Methodology';
@@ -42,6 +43,7 @@ export default function App() {
         <div className="area-details">
           <CumulativeChart rows={results.costs.rows} />
           <BreakdownChart rows={results.costs.rows} />
+          <SpeedCharts points={results.speed} inputs={inputs} />
           <HealthPanel results={results} inputs={inputs} />
           <Methodology />
         </div>
